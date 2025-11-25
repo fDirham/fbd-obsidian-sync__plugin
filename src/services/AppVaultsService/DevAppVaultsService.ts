@@ -2,6 +2,7 @@ import { sleepPromise } from "src/utils";
 import { Mock_GetVaultsResponse_Success } from "src/mockData";
 import AppVaultsService from "./AppVaultsService";
 import AppGlobalState from "../AppGlobalState/AppGlobalState";
+import { AppVault } from "src/model/AppVault";
 
 export default class DevAppVaultsService extends AppVaultsService {
 	private _ags: AppGlobalState;
@@ -30,6 +31,35 @@ export default class DevAppVaultsService extends AppVaultsService {
 		await sleepPromise(1000);
 		console.log(
 			`Downloaded backup ${backupId} for vault ${vaultId} (mock)`
+		);
+	}
+
+	async createVault(vaultName: string): Promise<AppVault> {
+		await sleepPromise(500);
+
+		const newVault: AppVault = {
+			id: `vault_${Date.now()}`,
+			name: vaultName,
+			backups: [],
+		};
+		this._ags.vaults.value = [...this._ags.vaults.value, newVault];
+		return newVault;
+	}
+
+	async deleteVault(vaultId: string): Promise<void> {
+		await sleepPromise(500);
+		this._ags.vaults.value = this._ags.vaults.value.filter(
+			(v) => v.id !== vaultId
+		);
+		if (this._ags.chosenVaultId.value === vaultId) {
+			this._ags.chosenVaultId.value = "";
+		}
+	}
+
+	async renameVault(vaultId: string, newName: string): Promise<void> {
+		await sleepPromise(500);
+		this._ags.vaults.value = this._ags.vaults.value.map((v) =>
+			v.id === vaultId ? { ...v, name: newName } : v
 		);
 	}
 }

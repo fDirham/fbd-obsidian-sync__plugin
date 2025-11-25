@@ -2,6 +2,8 @@ import { App, PluginSettingTab, Setting } from "obsidian";
 import LogInModal from "./modals/LogInModal";
 import AppPlugin from "./AppPlugin/AppPlugin";
 import { AuthStatus } from "./model/AuthStatus";
+import NewVaultModal from "./modals/NewVaultModal";
+import EditVaultModal from "./modals/EditVaultModal";
 
 export default class AppSettingTab extends PluginSettingTab {
 	private _plugin: AppPlugin;
@@ -45,10 +47,13 @@ export default class AppSettingTab extends PluginSettingTab {
 				break;
 			}
 			case AuthStatus.LOGGED_IN: {
-				const selectedVaultId = chosenVaultId.value;
+				let selectedVaultId = chosenVaultId.value;
 				const selectedVault = vaults.value.find(
 					(vault) => vault.id === selectedVaultId
 				);
+				if (!selectedVault && selectedVaultId != "") {
+					selectedVaultId = "";
+				}
 				new Setting(containerEl)
 					.setName("Chosen Vault")
 					.addDropdown((dropdown) => {
@@ -56,13 +61,25 @@ export default class AppSettingTab extends PluginSettingTab {
 							dropdown.addOption(vault.id, vault.name);
 						});
 						dropdown.addOption("", "None");
+						dropdown.addOption("add", "+ Add Vault");
 						dropdown.setValue(selectedVaultId);
 						dropdown.onChange((value) => {
+							if (value === "add") {
+								new NewVaultModal(
+									this.app,
+									this._plugin
+								).open();
+								return;
+							}
 							chosenVaultId.value = value;
 						});
 					});
 
 				if (selectedVault) {
+					new Setting(containerEl)
+						.setName(selectedVault.name)
+						.setHeading();
+
 					selectedVault.backups.forEach((backup) => {
 						new Setting(containerEl)
 							.setName(`${backup.id}`)
@@ -76,6 +93,25 @@ export default class AppSettingTab extends PluginSettingTab {
 								})
 							);
 					});
+
+					new Setting(containerEl)
+						.setName("Vault actions")
+						.addButton((button) =>
+							button.setButtonText("Delete").onClick(() => {
+								this._plugin.appVaultsService.deleteVault(
+									selectedVault.id
+								);
+							})
+						)
+						.addButton((button) =>
+							button.setButtonText("Rename").onClick(() => {
+								new EditVaultModal(
+									this.app,
+									this._plugin,
+									selectedVault
+								).open();
+							})
+						);
 				}
 
 				new Setting(containerEl).setName("").addButton((button) =>
