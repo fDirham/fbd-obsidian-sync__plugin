@@ -78,7 +78,14 @@ export default class AppSettingTab extends PluginSettingTab {
 				if (selectedVault) {
 					new Setting(containerEl)
 						.setName(selectedVault.name)
-						.setHeading();
+						.setHeading()
+						.addButton((button) =>
+							button.setButtonText("Upload").onClick(() => {
+								this._plugin.appVaultsService.uploadBackup(
+									selectedVault.id
+								);
+							})
+						);
 
 					selectedVault.backups.forEach((backup) => {
 						new Setting(containerEl)

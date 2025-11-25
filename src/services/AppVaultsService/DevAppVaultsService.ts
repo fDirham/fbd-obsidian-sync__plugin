@@ -76,4 +76,22 @@ export default class DevAppVaultsService extends AppVaultsService {
 			return v;
 		});
 	}
+
+	async uploadBackup(vaultId: string): Promise<void> {
+		await sleepPromise(1000);
+		const vaults = this._ags.vaults.value;
+		this._ags.vaults.value = vaults.map((v): AppVault => {
+			if (v.id === vaultId) {
+				const newBackup = {
+					id: `backup_${Date.now()}`,
+					createdAt: new Date(),
+				};
+				return {
+					...v,
+					backups: [...v.backups, newBackup],
+				};
+			}
+			return v;
+		});
+	}
 }
