@@ -1,25 +1,26 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import LogInModal from "./modals/LogInModal";
-import BaseAppPlugin from "./model/BaseAppPlugin";
-import { AuthStatus } from "./services/AuthService";
+import AppPlugin from "./AppPlugin/AppPlugin";
+import { AuthStatus } from "./model/AppGlobalState";
 
 export default class AppSettingTab extends PluginSettingTab {
-	plugin: BaseAppPlugin;
-	constructor(app: App, plugin: BaseAppPlugin) {
+	private _plugin: AppPlugin;
+
+	constructor(app: App, plugin: AppPlugin) {
 		super(app, plugin);
-		this.plugin = plugin;
-		this.plugin.authService.status.addListener("settings", () => {
+		this._plugin = plugin;
+
+		const { authStatus, vaults, chosenVaultId } = plugin.appGlobalState;
+
+		authStatus.addListener("settings", () => {
 			this.display();
 		});
-		this.plugin.appVaultsService.vaults.addListener("settings", () => {
+		vaults.addListener("settings", () => {
 			this.display();
 		});
-		this.plugin.appVaultsService.chosenVaultId.addListener(
-			"settings",
-			() => {
-				this.display();
-			}
-		);
+		chosenVaultId.addListener("settings", () => {
+			this.display();
+		});
 	}
 
 	display(): void {
@@ -29,37 +30,35 @@ export default class AppSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl).setName("FBD Obsidian Sync").setHeading();
 
-		switch (this.plugin.authService.status.value) {
+		const { authStatus, vaults, chosenVaultId } =
+			this._plugin.appGlobalState;
+
+		switch (authStatus.value) {
 			case AuthStatus.LOGGED_OUT: {
 				new Setting(containerEl)
 					.setName("Not Logged In")
 					.addButton((button) =>
 						button.setButtonText("Log In").onClick(() => {
-							new LogInModal(this.app, this.plugin).open();
+							new LogInModal(this.app, this._plugin).open();
 						})
 					);
 				break;
 			}
 			case AuthStatus.LOGGED_IN: {
-				const selectedVaultId =
-					this.plugin.appVaultsService.chosenVaultId.value;
-				const selectedVault =
-					this.plugin.appVaultsService.vaults.value.find(
-						(vault) => vault.id === selectedVaultId
-					);
+				const selectedVaultId = chosenVaultId.value;
+				const selectedVault = vaults.value.find(
+					(vault) => vault.id === selectedVaultId
+				);
 				new Setting(containerEl)
 					.setName("Chosen Vault")
 					.addDropdown((dropdown) => {
-						this.plugin.appVaultsService.vaults.value.forEach(
-							(vault) => {
-								dropdown.addOption(vault.id, vault.name);
-							}
-						);
+						vaults.value.forEach((vault) => {
+							dropdown.addOption(vault.id, vault.name);
+						});
 						dropdown.addOption("", "None");
 						dropdown.setValue(selectedVaultId);
 						dropdown.onChange((value) => {
-							this.plugin.appVaultsService.chosenVaultId.value =
-								value;
+							chosenVaultId.value = value;
 						});
 					});
 
@@ -81,7 +80,7 @@ export default class AppSettingTab extends PluginSettingTab {
 
 				new Setting(containerEl).setName("").addButton((button) =>
 					button.setButtonText("Log Out").onClick(() => {
-						this.plugin.authService.logout();
+						this._plugin.authService.logout();
 					})
 				);
 

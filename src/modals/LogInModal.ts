@@ -1,17 +1,17 @@
 import { App, Modal, Setting } from "obsidian";
-import BaseAppPlugin from "src/model/BaseAppPlugin";
-import { AuthStatus } from "src/services/AuthService";
+import AppPlugin from "src/AppPlugin/AppPlugin";
+import { AuthStatus } from "src/model/AppGlobalState";
 
 export default class LogInModal extends Modal {
-	plugin: BaseAppPlugin;
+	plugin: AppPlugin;
 
-	constructor(app: App, plugin: BaseAppPlugin) {
+	constructor(app: App, plugin: AppPlugin) {
 		super(app);
 		this.plugin = plugin;
 
 		this.setTitle("Log in");
 
-		this.plugin.authService.status.addListener(
+		this.plugin.appGlobalState.authStatus.addListener(
 			"loginmodal",
 			(_, newVal) => {
 				if (newVal != AuthStatus.LOGGED_OUT) {

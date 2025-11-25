@@ -1,1 +1,1 @@
-export { default } from "src/AppPlugin";
+export { default } from "src/AppPlugin/ProdAppPlugin";
