@@ -3,8 +3,9 @@ import { Mock_LoginResponse_Success } from "src/mockData";
 import { LocalStorageKeys } from "src/model/LocalStorageKeys";
 import { sleepPromise } from "src/utils";
 import AuthService from "./AuthService";
-import AppGlobalState, { AuthStatus } from "src/model/AppGlobalState";
 import { AuthCreds } from "src/model/AuthCreds";
+import AppGlobalState from "../AppGlobalState/AppGlobalState";
+import { AuthStatus } from "src/model/AuthStatus";
 
 export default class DevAuthService extends AuthService {
 	private _ags: AppGlobalState;

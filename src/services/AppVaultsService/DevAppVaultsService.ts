@@ -1,7 +1,7 @@
 import { sleepPromise } from "src/utils";
 import { Mock_GetVaultsResponse_Success } from "src/mockData";
 import AppVaultsService from "./AppVaultsService";
-import AppGlobalState from "src/model/AppGlobalState";
+import AppGlobalState from "../AppGlobalState/AppGlobalState";
 
 export default class DevAppVaultsService extends AppVaultsService {
 	private _ags: AppGlobalState;

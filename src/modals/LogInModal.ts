@@ -1,6 +1,6 @@
 import { App, Modal, Setting } from "obsidian";
 import AppPlugin from "src/AppPlugin/AppPlugin";
-import { AuthStatus } from "src/model/AppGlobalState";
+import { AuthStatus } from "src/model/AuthStatus";
 
 export default class LogInModal extends Modal {
 	plugin: AppPlugin;

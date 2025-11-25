@@ -1,5 +1,5 @@
 import { App, Plugin, PluginManifest } from "obsidian";
-import AppGlobalState from "src/model/AppGlobalState";
+import AppGlobalState from "src/services/AppGlobalState/AppGlobalState";
 import AppVaultsService from "src/services/AppVaultsService/AppVaultsService";
 import AuthService from "src/services/AuthService/AuthService";
 
