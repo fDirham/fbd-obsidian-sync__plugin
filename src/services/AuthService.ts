@@ -1,5 +1,5 @@
 import { App } from "obsidian";
-import { LoginResponse } from "src/model/dto/LoginResponse";
+import { Mock_LoginResponse_Success } from "src/mockData";
 import { LocalStorageKeys } from "src/model/LocalStorageKeys";
 import ObservableValue from "src/model/ObservableValue";
 import { sleepPromise } from "src/utils";
@@ -40,12 +40,7 @@ export default class AuthService {
 		await sleepPromise(1000);
 
 		// Mock generic success for now
-		const creds: LoginResponse = {
-			token: "placeholder_token",
-			refreshToken: "placeholder_refreshToken",
-			idToken: "placeholder_idToken",
-			expiresIn: 3600,
-		};
+		const creds = Mock_LoginResponse_Success;
 
 		this.app.saveLocalStorage(LocalStorageKeys.CREDS, creds);
 
