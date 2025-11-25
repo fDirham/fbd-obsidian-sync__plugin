@@ -86,8 +86,16 @@ export default class AppSettingTab extends PluginSettingTab {
 							.setDesc(`${backup.createdAt.toLocaleString()}`)
 							.addButton((button) =>
 								button.setButtonText("Restore").onClick(() => {
-									console.log(
-										"Back up restore clicked for",
+									this._plugin.appVaultsService.downloadBackup(
+										selectedVault.id,
+										backup.id
+									);
+								})
+							)
+							.addButton((button) =>
+								button.setButtonText("Delete").onClick(() => {
+									this._plugin.appVaultsService.deleteBackup(
+										selectedVault.id,
 										backup.id
 									);
 								})

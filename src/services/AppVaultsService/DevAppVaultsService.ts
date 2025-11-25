@@ -27,13 +27,6 @@ export default class DevAppVaultsService extends AppVaultsService {
 		this._ags.vaults.value = [];
 	}
 
-	async downloadBackup(vaultId: string, backupId: string) {
-		await sleepPromise(1000);
-		console.log(
-			`Downloaded backup ${backupId} for vault ${vaultId} (mock)`
-		);
-	}
-
 	async createVault(vaultName: string): Promise<AppVault> {
 		await sleepPromise(500);
 
@@ -61,5 +54,26 @@ export default class DevAppVaultsService extends AppVaultsService {
 		this._ags.vaults.value = this._ags.vaults.value.map((v) =>
 			v.id === vaultId ? { ...v, name: newName } : v
 		);
+	}
+
+	async downloadBackup(vaultId: string, backupId: string) {
+		await sleepPromise(1000);
+		console.log(
+			`Downloaded backup ${backupId} for vault ${vaultId} (mock)`
+		);
+	}
+
+	async deleteBackup(vaultId: string, backupId: string): Promise<void> {
+		await sleepPromise(500);
+		const vaults = this._ags.vaults.value;
+		this._ags.vaults.value = vaults.map((v) => {
+			if (v.id === vaultId) {
+				return {
+					...v,
+					backups: v.backups.filter((b) => b.id !== backupId),
+				};
+			}
+			return v;
+		});
 	}
 }
