@@ -5,10 +5,13 @@ import DevAuthService from "src/services/AuthService/DevAuthService";
 import AppSettingTab from "src/AppSettingTab";
 import ProdAppGlobalState from "src/services/AppGlobalState/ProdAppGlobalState";
 import { AuthStatus } from "src/model/AuthStatus";
+import AppData from "src/model/AppData";
 
 export default class ProdAppPlugin extends AppPlugin {
 	constructor(app: App, manifest: PluginManifest) {
-		const ags = new ProdAppGlobalState();
+		const ags = new ProdAppGlobalState((d) => {
+			this.saveAppData(d);
+		});
 		const authService = new DevAuthService(ags, app);
 		const appVaultsService = new DevAppVaultsService(ags);
 
@@ -25,6 +28,7 @@ export default class ProdAppPlugin extends AppPlugin {
 				}
 			}
 		);
+		ags.assignDataAndValuesListeners();
 	}
 
 	async onload() {
@@ -37,14 +41,23 @@ export default class ProdAppPlugin extends AppPlugin {
 	onunload() {}
 
 	async loadSettings() {
-		// this.settings = Object.assign(
-		// 	{},
-		// 	DEFAULT_SETTINGS,
-		// 	await this.loadData()
-		// );
+		const rawData = (await this.loadData()) as Partial<AppData>;
+		const defaultData: AppData = {
+			chosenVaultId: "",
+		};
+		const appData: AppData = {
+			...defaultData,
+			...rawData,
+		};
+
+		this.appGlobalState.onDataLoaded(appData);
 	}
 
-	async saveSettings() {
-		// await this.saveData(this.settings);
+	onExternalSettingsChange() {
+		this.loadSettings();
+	}
+
+	async saveAppData(data: AppData) {
+		await this.saveData(data);
 	}
 }

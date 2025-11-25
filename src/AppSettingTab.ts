@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import LogInModal from "./modals/LogInModal";
 import AppPlugin from "./AppPlugin/AppPlugin";
-import { AuthStatus } from "./model/AppGlobalState";
+import { AuthStatus } from "./model/AuthStatus";
 
 export default class AppSettingTab extends PluginSettingTab {
 	private _plugin: AppPlugin;

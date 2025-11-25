@@ -2,7 +2,7 @@ import { AppVault } from "src/model/AppVault";
 import { AuthCreds } from "src/model/AuthCreds";
 import { AuthStatus } from "src/model/AuthStatus";
 import ObservableValue from "src/model/ObservableValue";
-import AppGlobalState from "./AppGlobalState";
+import AppGlobalState, { SaveAppDataFunction } from "./AppGlobalState";
 
 export default class ProdAppGlobalState extends AppGlobalState {
 	private _authStatus: ObservableValue<AuthStatus>;
@@ -10,8 +10,8 @@ export default class ProdAppGlobalState extends AppGlobalState {
 	private _vaults: ObservableValue<AppVault[]>;
 	private _chosenVaultId: ObservableValue<string>;
 
-	constructor() {
-		super();
+	constructor(saveData: SaveAppDataFunction) {
+		super(saveData);
 		this._authStatus = new ObservableValue(AuthStatus.LOADING);
 		this._vaults = new ObservableValue<AppVault[]>([]);
 		this._authCreds = new ObservableValue<AuthCreds | null>(null);

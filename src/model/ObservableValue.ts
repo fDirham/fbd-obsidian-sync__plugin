@@ -17,7 +17,9 @@ export default class ObservableValue<T> {
 		const oldVal = this._val;
 		this._val = newVal;
 
+		console.debug("Value changed from", oldVal, "to", newVal);
 		this.listeners.forEach((cb, key) => {
+			console.debug("Firing listener", key);
 			cb(oldVal, newVal);
 		});
 	}
