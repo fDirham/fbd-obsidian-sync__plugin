@@ -90,7 +90,9 @@ export default class AppSettingTab extends PluginSettingTab {
 					selectedVault.backups.forEach((backup) => {
 						new Setting(containerEl)
 							.setName(`${backup.id}`)
-							.setDesc(`${backup.createdAt.toLocaleString()}`)
+							.setDesc(
+								`${new Date(backup.createdAt).toLocaleString()}`
+							)
 							.addButton((button) =>
 								button.setButtonText("Restore").onClick(() => {
 									this._plugin.appVaultsService.downloadBackup(

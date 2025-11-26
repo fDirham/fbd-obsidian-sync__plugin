@@ -84,7 +84,7 @@ export default class DevAppVaultsService extends AppVaultsService {
 			if (v.id === vaultId) {
 				const newBackup = {
 					id: `backup_${Date.now()}`,
-					createdAt: new Date(),
+					createdAt: new Date().getTime(),
 				};
 				return {
 					...v,

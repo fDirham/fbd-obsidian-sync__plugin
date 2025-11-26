@@ -15,15 +15,15 @@ export const Mock_GetVaultsResponse_Success: GetVaultsResponse = {
 			id: "vault-001",
 			backups: [
 				{
-					createdAt: new Date("2024-11-25T10:30:00Z"),
+					createdAt: new Date("2024-11-25T10:30:00Z").getTime(),
 					id: "backup-001",
 				},
 				{
-					createdAt: new Date("2024-11-24T10:30:00Z"),
+					createdAt: new Date("2024-11-24T10:30:00Z").getTime(),
 					id: "backup-002",
 				},
 				{
-					createdAt: new Date("2024-11-23T10:30:00Z"),
+					createdAt: new Date("2024-11-23T10:30:00Z").getTime(),
 					id: "backup-003",
 				},
 			],
@@ -33,11 +33,11 @@ export const Mock_GetVaultsResponse_Success: GetVaultsResponse = {
 			id: "vault-002",
 			backups: [
 				{
-					createdAt: new Date("2024-11-25T08:15:00Z"),
+					createdAt: new Date("2024-11-25T08:15:00Z").getTime(),
 					id: "backup-004",
 				},
 				{
-					createdAt: new Date("2024-11-22T08:15:00Z"),
+					createdAt: new Date("2024-11-22T08:15:00Z").getTime(),
 					id: "backup-005",
 				},
 			],
@@ -47,7 +47,7 @@ export const Mock_GetVaultsResponse_Success: GetVaultsResponse = {
 			id: "vault-003",
 			backups: [
 				{
-					createdAt: new Date("2024-11-25T14:00:00Z"),
+					createdAt: new Date("2024-11-25T14:00:00Z").getTime(),
 					id: "backup-006",
 				},
 			],
