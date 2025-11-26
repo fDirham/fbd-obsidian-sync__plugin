@@ -1,11 +1,11 @@
 import { App, PluginManifest } from "obsidian";
 import AppPlugin from "./AppPlugin";
-import DevAppVaultsService from "src/services/AppVaultsService/DevAppVaultsService";
 import AppSettingTab from "src/AppSettingTab";
 import ProdAppGlobalState from "src/services/AppGlobalState/ProdAppGlobalState";
 import { AuthStatus } from "src/model/AuthStatus";
 import AppData from "src/model/AppData";
 import LocalhostAuthService from "src/services/AuthService/LocalhostAuthService";
+import LocalhostAppVaultsService from "src/services/AppVaultsService/LocalhostAppVaultsService";
 
 export default class ProdAppPlugin extends AppPlugin {
 	constructor(app: App, manifest: PluginManifest) {
@@ -13,7 +13,7 @@ export default class ProdAppPlugin extends AppPlugin {
 			this.saveAppData(d);
 		});
 		const authService = new LocalhostAuthService(ags, app);
-		const appVaultsService = new DevAppVaultsService(ags);
+		const appVaultsService = new LocalhostAppVaultsService(ags);
 
 		super(app, manifest, ags, authService, appVaultsService);
 

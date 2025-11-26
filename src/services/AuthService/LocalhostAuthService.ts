@@ -63,9 +63,8 @@ export default class LocalhostAuthService extends AuthService {
 
 		const loginRes: LoginResponse = await fetchRes.json();
 
-		this._ags.authStatus.value = AuthStatus.LOGGED_IN;
-
 		this._ags.authCreds.value = loginRes;
+		this._ags.authStatus.value = AuthStatus.LOGGED_IN;
 		this._app.saveLocalStorage(
 			LocalStorageKeys.CREDS,
 			this._ags.authCreds.value
