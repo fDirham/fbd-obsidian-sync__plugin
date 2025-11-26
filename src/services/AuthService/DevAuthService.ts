@@ -50,12 +50,16 @@ export default class DevAuthService extends AuthService {
 
 		this._app.saveLocalStorage(
 			LocalStorageKeys.CREDS,
-			Mock_LoginResponse_Success
+			this._ags.authCreds.value
 		);
 	}
 
 	async deleteAccount(): Promise<void> {
 		await sleepPromise(1000);
 		console.log("Mock delete account");
+	}
+
+	async checkAndRefreshToken(): Promise<AuthCreds> {
+		return Mock_LoginResponse_Success;
 	}
 }

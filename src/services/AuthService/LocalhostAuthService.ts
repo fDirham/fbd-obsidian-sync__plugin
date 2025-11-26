@@ -1,0 +1,132 @@
+import { App } from "obsidian";
+import { LocalStorageKeys } from "src/model/LocalStorageKeys";
+import { decodeJwt, sleepPromise } from "src/utils";
+import AuthService from "./AuthService";
+import { AuthCreds } from "src/model/AuthCreds";
+import AppGlobalState from "../AppGlobalState/AppGlobalState";
+import { AuthStatus } from "src/model/AuthStatus";
+import { LoginResponse } from "src/model/dto/LoginResponse";
+import { IdTokenDecoded } from "src/model/IdTokenDecoded";
+
+const API_URL = "http://localhost:3000/user";
+
+export default class LocalhostAuthService extends AuthService {
+	private _ags: AppGlobalState;
+	private _app: App;
+
+	constructor(ags: AppGlobalState, app: App) {
+		super();
+		this._ags = ags;
+		this._app = app;
+	}
+
+	async load() {
+		const credsJson: AuthCreds | null = this._app.loadLocalStorage(
+			LocalStorageKeys.CREDS
+		);
+		this._ags.authCreds.value = credsJson;
+
+		if (credsJson) {
+			try {
+				this._ags.authCreds.value = await this.checkAndRefreshToken();
+				this._ags.authStatus.value = AuthStatus.LOGGED_IN;
+			} catch (e) {
+				console.error("Token refresh failed during load:", e);
+				this._ags.authCreds.value = null;
+				this._ags.authStatus.value = AuthStatus.LOGGED_OUT;
+			}
+		} else {
+			this._ags.authStatus.value = AuthStatus.LOGGED_OUT;
+		}
+
+		console.log("DevAuthService loaded");
+	}
+
+	async logout() {
+		this._ags.authStatus.value = AuthStatus.LOGGED_OUT;
+		this._ags.authCreds.value = null;
+		this._app.saveLocalStorage(LocalStorageKeys.CREDS, null);
+	}
+
+	async login(email: string, password: string) {
+		const fetchRes = await fetch(`${API_URL}/login`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ email, password }),
+		});
+
+		if (!fetchRes.ok) {
+			throw new Error(`Login failed with status ${fetchRes.status}`);
+		}
+
+		const loginRes: LoginResponse = await fetchRes.json();
+
+		this._ags.authStatus.value = AuthStatus.LOGGED_IN;
+
+		this._ags.authCreds.value = loginRes;
+		this._app.saveLocalStorage(
+			LocalStorageKeys.CREDS,
+			this._ags.authCreds.value
+		);
+	}
+
+	async deleteAccount(): Promise<void> {
+		await sleepPromise(1000);
+		console.log("Mock delete account");
+	}
+
+	async checkAndRefreshToken(): Promise<AuthCreds> {
+		const currentCreds = this._ags.authCreds.value;
+		if (!currentCreds) {
+			throw new Error("No current credentials to refresh");
+		}
+
+		try {
+			const decoded: IdTokenDecoded = decodeJwt(currentCreds.idToken);
+			const nowSec = Date.now() / 1000;
+
+			// If token is still valid for more than 5 minutes, return current creds
+			if (decoded.exp - nowSec > 300) {
+				console.debug("Token still valid, no refresh needed");
+				return currentCreds;
+			}
+
+			console.debug("Refreshing token");
+			// Otherwise, refresh the token
+			const fetchRes = await fetch(`${API_URL}/refresh`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					uid: decoded.sub,
+					email: decoded.email,
+				}),
+			});
+
+			if (!fetchRes.ok) {
+				throw new Error(
+					`Refresh failed with status ${fetchRes.status}`
+				);
+			}
+
+			const refreshRes: LoginResponse = await fetchRes.json();
+
+			const newCreds: AuthCreds = refreshRes;
+
+			this._ags.authCreds.value = newCreds;
+
+			this._app.saveLocalStorage(
+				LocalStorageKeys.CREDS,
+				this._ags.authCreds.value
+			);
+
+			console.debug("Token refreshed successfully");
+			return newCreds;
+		} catch (e) {
+			throw new Error("Couldn't parse access token");
+		}
+	}
+}

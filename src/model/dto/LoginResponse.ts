@@ -1,3 +1,6 @@
-import { AuthCreds } from "../AuthCreds";
-
-export interface LoginResponse extends AuthCreds {}
+export interface LoginResponse {
+	token: string;
+	refreshToken: string;
+	idToken: string;
+	expiresIn: number;
+}
