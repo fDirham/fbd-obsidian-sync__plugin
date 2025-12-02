@@ -12,7 +12,14 @@ import {
 	extractZipToVault,
 	uploadVaultZip,
 } from "./LocalhostUtils";
-import { DownloadBackupResponse } from "src/model/dto/DownloadBackupResponse";
+import { typedFetch } from "src/utils";
+import { CreateVaultRequest } from "src/model/dto/CreateVaultRequest";
+import { RenameVaultRequest } from "src/model/dto/RenameVaultRequest";
+import { StartBackupRequest } from "src/model/dto/StartBackupRequest";
+import { CheckBackupRequest } from "src/model/dto/CheckBackupRequest";
+import { DeleteBackupQueryParams } from "src/model/dto/DeleteBackupQueryParams";
+import { GetBackupUrlResponse } from "src/model/dto/GetBackupUrlResponse";
+import { GetBackupUrlQueryParams } from "src/model/dto/GetBackupUrlQueryParams";
 
 const API_URL = "http://localhost:3000/vault";
 
@@ -36,21 +43,15 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
 
-		const fetchRes = await fetch(`${API_URL}`, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${creds.token}`,
-			},
-		});
-
-		if (!fetchRes.ok) {
-			throw new Error(
-				`Failed to load vaults with status ${fetchRes.status}`
-			);
-		}
-
-		const vaultsResponse: GetVaultsResponse = await fetchRes.json();
+		const vaultsResponse = await typedFetch<never, GetVaultsResponse>(
+			`${API_URL}`,
+			{
+				method: "GET",
+				headers: {
+					Authorization: `Bearer ${creds.token}`,
+				},
+			}
+		);
 
 		const toSet = vaultsResponse.vaults;
 		this._ags.vaults.value = toSet;
@@ -67,22 +68,19 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
 
-		const fetchRes = await fetch(`${API_URL}`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${creds.token}`,
+		const createVaultRes = await typedFetch<
+			CreateVaultRequest,
+			CreateVaultResponse
+		>(
+			`${API_URL}`,
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${creds.token}`,
+				},
 			},
-			body: JSON.stringify({ name: vaultName }),
-		});
-
-		if (!fetchRes.ok) {
-			throw new Error(
-				`Failed to load vaults with status ${fetchRes.status}`
-			);
-		}
-
-		const createVaultRes: CreateVaultResponse = await fetchRes.json();
+			{ name: vaultName }
+		);
 
 		const newVault: AppVault = {
 			id: createVaultRes.vaultId,
@@ -99,19 +97,12 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
 
-		const fetchRes = await fetch(`${API_URL}/${vaultId}`, {
+		await typedFetch<never, void>(`${API_URL}/${vaultId}`, {
 			method: "DELETE",
 			headers: {
-				"Content-Type": "application/json",
 				Authorization: `Bearer ${creds.token}`,
 			},
 		});
-
-		if (!fetchRes.ok) {
-			throw new Error(
-				`Failed to load vaults with status ${fetchRes.status}`
-			);
-		}
 
 		this._ags.vaults.value = this._ags.vaults.value.filter(
 			(v) => v.id !== vaultId
@@ -127,20 +118,16 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
 
-		const fetchRes = await fetch(`${API_URL}`, {
-			method: "PUT",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${creds.token}`,
+		await typedFetch<RenameVaultRequest, void>(
+			`${API_URL}`,
+			{
+				method: "PUT",
+				headers: {
+					Authorization: `Bearer ${creds.token}`,
+				},
 			},
-			body: JSON.stringify({ vaultId, newName }),
-		});
-
-		if (!fetchRes.ok) {
-			throw new Error(
-				`Failed to load vaults with status ${fetchRes.status}`
-			);
-		}
+			{ vaultId, newName }
+		);
 
 		this._ags.vaults.value = this._ags.vaults.value.map((v) =>
 			v.id === vaultId ? { ...v, name: newName } : v
@@ -156,26 +143,22 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
 
-		const downloadBackupFetchRes = await fetch(
-			`${API_URL}/backup?b=${backupId}`,
+		const downloadBackupRes = await typedFetch<
+			never,
+			GetBackupUrlResponse,
+			GetBackupUrlQueryParams
+		>(
+			`${API_URL}/backup`,
 			{
 				method: "GET",
 				headers: {
-					"Content-Type": "application/json",
 					Authorization: `Bearer ${creds.token}`,
 				},
-			}
+			},
+			null,
+			{ b: backupId }
 		);
-
-		if (!downloadBackupFetchRes.ok) {
-			throw new Error(
-				`Failed to load vaults with status ${downloadBackupFetchRes.status}`
-			);
-		}
 		console.debug("Fetched download URL");
-
-		const downloadBackupRes: DownloadBackupResponse =
-			await downloadBackupFetchRes.json();
 		const downloadUrl = downloadBackupRes.downloadUrl;
 
 		const tmpFilePath = normalizePath(`/vault-backup-${backupId}.zip`);
@@ -202,22 +185,17 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
 
-		const deleteBackupFetchRes = await fetch(
-			`${API_URL}/backup?b=${backupId}`,
+		await typedFetch<never, void, DeleteBackupQueryParams>(
+			`${API_URL}/backup`,
 			{
 				method: "DELETE",
 				headers: {
-					"Content-Type": "application/json",
 					Authorization: `Bearer ${creds.token}`,
 				},
-			}
+			},
+			null,
+			{ b: backupId }
 		);
-
-		if (!deleteBackupFetchRes.ok) {
-			throw new Error(
-				`Failed to load vaults with status ${deleteBackupFetchRes.status}`
-			);
-		}
 
 		const vaults = this._ags.vaults.value;
 		this._ags.vaults.value = vaults.map((v) => {
@@ -237,43 +215,35 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
 
-		const startBackupFetchRes = await fetch(`${API_URL}/backup`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${creds.token}`,
+		const startBackupRes = await typedFetch<
+			StartBackupRequest,
+			StartBackupResponse
+		>(
+			`${API_URL}/backup`,
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${creds.token}`,
+				},
 			},
-			body: JSON.stringify({ vaultId }),
-		});
-
-		if (!startBackupFetchRes.ok) {
-			throw new Error(
-				`Failed to load vaults with status ${startBackupFetchRes.status}`
-			);
-		}
-
-		const startBackupRes: StartBackupResponse =
-			await startBackupFetchRes.json();
+			{ vaultId }
+		);
 
 		await uploadVaultZip(this._app, startBackupRes.presignedUrl);
 
-		const checkVaultBackupsFetchRes = await fetch(`${API_URL}/check`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${creds.token}`,
+		const checkVaultBackupsRes = await typedFetch<
+			CheckBackupRequest,
+			CheckVaultBackupsResponse
+		>(
+			`${API_URL}/check`,
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${creds.token}`,
+				},
 			},
-			body: JSON.stringify({ vaultId }),
-		});
-
-		if (!checkVaultBackupsFetchRes.ok) {
-			throw new Error(
-				`Failed to load vaults with status ${checkVaultBackupsFetchRes.status}`
-			);
-		}
-
-		const checkVaultBackupsRes: CheckVaultBackupsResponse =
-			await checkVaultBackupsFetchRes.json();
+			{ vaultId }
+		);
 
 		const vault = checkVaultBackupsRes.vault;
 

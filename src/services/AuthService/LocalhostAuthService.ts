@@ -1,12 +1,14 @@
 import { App } from "obsidian";
 import { LocalStorageKeys } from "src/model/LocalStorageKeys";
-import { decodeJwt, sleepPromise } from "src/utils";
+import { decodeJwt, sleepPromise, typedFetch } from "src/utils";
 import AuthService from "./AuthService";
 import { AuthCreds } from "src/model/AuthCreds";
 import AppGlobalState from "../AppGlobalState/AppGlobalState";
 import { AuthStatus } from "src/model/AuthStatus";
 import { LoginResponse } from "src/model/dto/LoginResponse";
 import { IdTokenDecoded } from "src/model/IdTokenDecoded";
+import { LoginRequest } from "src/model/dto/LoginRequest";
+import { RefreshTokenRequest } from "src/model/dto/RefreshTokenRequest";
 
 const API_URL = "http://localhost:3000/user";
 
@@ -49,19 +51,11 @@ export default class LocalhostAuthService extends AuthService {
 	}
 
 	async login(email: string, password: string) {
-		const fetchRes = await fetch(`${API_URL}/login`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ email, password }),
-		});
-
-		if (!fetchRes.ok) {
-			throw new Error(`Login failed with status ${fetchRes.status}`);
-		}
-
-		const loginRes: LoginResponse = await fetchRes.json();
+		const loginRes = await typedFetch<LoginRequest, LoginResponse>(
+			`${API_URL}/login`,
+			{ method: "POST" },
+			{ email, password }
+		);
 
 		this._ags.authCreds.value = { ...loginRes, email };
 		this._ags.authStatus.value = AuthStatus.LOGGED_IN;
@@ -102,25 +96,18 @@ export default class LocalhostAuthService extends AuthService {
 
 			console.debug("Refreshing token");
 			// Otherwise, refresh the token
-			const fetchRes = await fetch(`${API_URL}/refresh`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
+			const refreshRes = await typedFetch<
+				RefreshTokenRequest,
+				LoginResponse
+			>(
+				`${API_URL}/refresh`,
+				{ method: "POST" },
+				{
 					uid: decoded.sub,
 					refreshToken: currentCreds.refreshToken,
 					email: currEmail,
-				}),
-			});
-
-			if (!fetchRes.ok) {
-				throw new Error(
-					`Refresh failed with status ${fetchRes.status}`
-				);
-			}
-
-			const refreshRes: LoginResponse = await fetchRes.json();
+				}
+			);
 
 			const newCreds: AuthCreds = { ...refreshRes, email: currEmail };
 
