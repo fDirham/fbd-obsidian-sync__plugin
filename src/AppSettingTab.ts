@@ -96,7 +96,6 @@ export default class AppSettingTab extends PluginSettingTab {
 							.addButton((button) =>
 								button.setButtonText("Restore").onClick(() => {
 									this._plugin.appVaultsService.downloadBackup(
-										selectedVault.id,
 										backup.id
 									);
 								})

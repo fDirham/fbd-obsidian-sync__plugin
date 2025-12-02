@@ -39,7 +39,7 @@ export default class LocalhostAuthService extends AuthService {
 			this._ags.authStatus.value = AuthStatus.LOGGED_OUT;
 		}
 
-		console.log("DevAuthService loaded");
+		console.log("LocalhostAuthService loaded");
 	}
 
 	async logout() {

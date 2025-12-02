@@ -7,7 +7,7 @@ export default abstract class AppVaultsService {
 	abstract createVault(vaultName: string): Promise<AppVault>;
 	abstract deleteVault(vaultId: string): Promise<void>;
 	abstract renameVault(vaultId: string, newName: string): Promise<void>;
-	abstract downloadBackup(vaultId: string, backupId: string): Promise<void>;
+	abstract downloadBackup(backupId: string): Promise<void>;
 	abstract deleteBackup(vaultId: string, backupId: string): Promise<void>;
 	abstract uploadBackup(vaultId: string): Promise<void>;
 }

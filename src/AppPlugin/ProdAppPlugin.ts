@@ -13,7 +13,7 @@ export default class ProdAppPlugin extends AppPlugin {
 			this.saveAppData(d);
 		});
 		const authService = new LocalhostAuthService(ags, app);
-		const appVaultsService = new LocalhostAppVaultsService(ags);
+		const appVaultsService = new LocalhostAppVaultsService(ags, app);
 
 		super(app, manifest, ags, authService, appVaultsService);
 
@@ -35,6 +35,10 @@ export default class ProdAppPlugin extends AppPlugin {
 		await this.loadSettings();
 		await this.authService.load();
 
+		// Use this for simple tests
+		// this.addRibbonIcon("dice", "Vault Manager", () => {
+		// 	// testUpload(this.app);
+		// });
 		this.addSettingTab(new AppSettingTab(this.app, this));
 	}
 

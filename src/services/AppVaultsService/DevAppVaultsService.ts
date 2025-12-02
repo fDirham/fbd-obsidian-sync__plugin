@@ -56,11 +56,9 @@ export default class DevAppVaultsService extends AppVaultsService {
 		);
 	}
 
-	async downloadBackup(vaultId: string, backupId: string) {
+	async downloadBackup(backupId: string) {
 		await sleepPromise(1000);
-		console.log(
-			`Downloaded backup ${backupId} for vault ${vaultId} (mock)`
-		);
+		console.log(`Downloaded backup ${backupId} `);
 	}
 
 	async deleteBackup(vaultId: string, backupId: string): Promise<void> {
