@@ -36,6 +36,7 @@ export default class LocalhostAuthService extends AuthService {
 				console.error("Token refresh failed during load:", e);
 				this._ags.authCreds.value = null;
 				this._ags.authStatus.value = AuthStatus.LOGGED_OUT;
+				this._app.saveLocalStorage(LocalStorageKeys.CREDS, null);
 			}
 		} else {
 			this._ags.authStatus.value = AuthStatus.LOGGED_OUT;
