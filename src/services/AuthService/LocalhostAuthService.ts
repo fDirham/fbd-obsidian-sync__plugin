@@ -1,5 +1,3 @@
-import { App } from "obsidian";
-import { LocalStorageKeys } from "src/model/LocalStorageKeys";
 import { decodeJwt, sleepPromise, typedFetch } from "src/utils";
 import AuthService from "./AuthService";
 import { AuthCreds } from "src/model/AuthCreds";
@@ -14,20 +12,14 @@ const API_URL = "http://localhost:3000/user";
 
 export default class LocalhostAuthService extends AuthService {
 	private _ags: AppGlobalState;
-	private _app: App;
 
-	constructor(ags: AppGlobalState, app: App) {
+	constructor(ags: AppGlobalState) {
 		super();
 		this._ags = ags;
-		this._app = app;
 	}
 
 	async load() {
-		const credsJson: AuthCreds | null = this._app.loadLocalStorage(
-			LocalStorageKeys.CREDS
-		);
-		this._ags.authCreds.value = credsJson;
-
+		const credsJson = this._ags.authCreds.value;
 		if (credsJson) {
 			try {
 				this._ags.authCreds.value = await this.checkAndRefreshToken();
@@ -36,7 +28,6 @@ export default class LocalhostAuthService extends AuthService {
 				console.error("Token refresh failed during load:", e);
 				this._ags.authCreds.value = null;
 				this._ags.authStatus.value = AuthStatus.LOGGED_OUT;
-				this._app.saveLocalStorage(LocalStorageKeys.CREDS, null);
 			}
 		} else {
 			this._ags.authStatus.value = AuthStatus.LOGGED_OUT;
@@ -48,7 +39,6 @@ export default class LocalhostAuthService extends AuthService {
 	async logout() {
 		this._ags.authStatus.value = AuthStatus.LOGGED_OUT;
 		this._ags.authCreds.value = null;
-		this._app.saveLocalStorage(LocalStorageKeys.CREDS, null);
 	}
 
 	async login(email: string, password: string) {
@@ -60,10 +50,6 @@ export default class LocalhostAuthService extends AuthService {
 
 		this._ags.authCreds.value = { ...loginRes, email };
 		this._ags.authStatus.value = AuthStatus.LOGGED_IN;
-		this._app.saveLocalStorage(
-			LocalStorageKeys.CREDS,
-			this._ags.authCreds.value
-		);
 	}
 
 	async deleteAccount(): Promise<void> {
@@ -113,11 +99,6 @@ export default class LocalhostAuthService extends AuthService {
 			const newCreds: AuthCreds = { ...refreshRes, email: currEmail };
 
 			this._ags.authCreds.value = newCreds;
-
-			this._app.saveLocalStorage(
-				LocalStorageKeys.CREDS,
-				this._ags.authCreds.value
-			);
 
 			console.debug("Token refreshed successfully");
 			return newCreds;

@@ -9,13 +9,11 @@ import LocalhostAppVaultsService from "src/services/AppVaultsService/LocalhostAp
 
 export default class ProdAppPlugin extends AppPlugin {
 	constructor(app: App, manifest: PluginManifest) {
-		const ags = new ProdAppGlobalState((d) => {
-			this.saveAppData(d);
-		});
-		const authService = new LocalhostAuthService(ags, app);
+		super(app, manifest);
+		const ags = new ProdAppGlobalState(app, this);
+		const authService = new LocalhostAuthService(ags);
 		const appVaultsService = new LocalhostAppVaultsService(ags, app);
-
-		super(app, manifest, ags, authService, appVaultsService);
+		this.setDependencies(ags, authService, appVaultsService);
 
 		// Register listeners
 		ags.authStatus.addListener(
@@ -32,6 +30,7 @@ export default class ProdAppPlugin extends AppPlugin {
 	}
 
 	async onload() {
+		this.appGlobalState.loadAllLocalStorage();
 		await this.loadSettings();
 		await this.authService.load();
 
@@ -59,9 +58,5 @@ export default class ProdAppPlugin extends AppPlugin {
 
 	onExternalSettingsChange() {
 		this.loadSettings();
-	}
-
-	async saveAppData(data: AppData) {
-		await this.saveData(data);
 	}
 }

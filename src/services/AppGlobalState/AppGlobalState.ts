@@ -3,18 +3,14 @@ import { AuthCreds } from "src/model/AuthCreds";
 import { AppVault } from "src/model/AppVault";
 import { AuthStatus } from "src/model/AuthStatus";
 import AppData from "src/model/AppData";
-
-export type SaveAppDataFunction = (data: AppData) => void;
+import { LocalStorageKeys } from "src/model/LocalStorageKeys";
 export default abstract class AppGlobalState {
 	abstract get authStatus(): ObservableValue<AuthStatus>;
 	abstract get authCreds(): ObservableValue<AuthCreds | null>;
 	abstract get vaults(): ObservableValue<AppVault[]>;
 	abstract get chosenVaultId(): ObservableValue<string>;
-	private _saveData: SaveAppDataFunction;
 
-	constructor(saveData: SaveAppDataFunction) {
-		this._saveData = saveData;
-	}
+	constructor() {}
 
 	log(): void {
 		console.group("AppGlobalState Debug");
@@ -33,11 +29,21 @@ export default abstract class AppGlobalState {
 				chosenVaultId: newVal,
 			};
 
-			this._saveData(newData);
+			this.saveData(newData);
+		});
+
+		this.authCreds.addListener("agsDataSync", (_, newVal) => {
+			this.saveLocalStorage(LocalStorageKeys.CREDS, newVal);
 		});
 	}
 
 	onDataLoaded(appData: AppData) {
 		this.chosenVaultId.value = appData.chosenVaultId;
 	}
+
+	abstract loadAllLocalStorage(): void;
+
+	abstract saveData(data: AppData): Promise<void>;
+
+	abstract saveLocalStorage(key: string, data: unknown): void;
 }

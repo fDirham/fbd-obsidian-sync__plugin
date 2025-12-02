@@ -8,14 +8,15 @@ export default abstract class AppPlugin extends Plugin {
 	private _appVaultsService: AppVaultsService;
 	private _appGlobalState: AppGlobalState;
 
-	constructor(
-		app: App,
-		manifest: PluginManifest,
+	constructor(app: App, manifest: PluginManifest) {
+		super(app, manifest);
+	}
+
+	setDependencies(
 		appGlobalState: AppGlobalState,
 		authService: AuthService,
 		appVaultsService: AppVaultsService
 	) {
-		super(app, manifest);
 		this._appGlobalState = appGlobalState;
 		this._authService = authService;
 		this._appVaultsService = appVaultsService;
