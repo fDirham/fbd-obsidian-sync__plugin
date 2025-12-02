@@ -14,7 +14,7 @@ export async function uploadVaultZip(
 	console.group("Zipping vault files for upload");
 
 	const files = app.vault.getFiles();
-	console.info(`Found ${files.length} files in vault`);
+	console.debug(`Found ${files.length} files in vault`);
 
 	let filesAdded = 0;
 	for (const file of files) {
@@ -29,7 +29,7 @@ export async function uploadVaultZip(
 			throw new Error(`Could not add file ${file.path} to zip: ${e}`);
 		}
 	}
-	console.info(`Added ${filesAdded} files to zip`);
+	console.debug(`Added ${filesAdded} files to zip`);
 
 	// 2. Generate zip file as a Blob or Uint8Array
 	const zippedContent = await zip.generateAsync({
@@ -37,7 +37,7 @@ export async function uploadVaultZip(
 		compression: "DEFLATE",
 		compressionOptions: { level: 6 },
 	});
-	console.info(`Generated zip file, size: ${zippedContent.length} bytes`);
+	console.debug(`Generated zip file, size: ${zippedContent.length} bytes`);
 
 	console.groupEnd();
 
@@ -54,7 +54,7 @@ export async function uploadVaultZip(
 			if (cb) {
 				cb(percent);
 			}
-			console.info(`Upload progress: ${percent}%`);
+			console.debug(`Upload progress: ${percent}%`);
 		},
 	});
 	console.groupEnd();
@@ -78,13 +78,13 @@ export async function downloadVaultZip(
 				if (cb) {
 					cb(percent);
 				}
-				console.info(`Download progress: ${percent}%`);
+				console.debug(`Download progress: ${percent}%`);
 			}
 		},
 	});
 
 	await app.vault.adapter.writeBinary(filePath, response.data);
-	console.info("Wrote downloaded zip to:", filePath);
+	console.debug("Wrote downloaded zip to:", filePath);
 	console.groupEnd();
 }
 
@@ -103,7 +103,7 @@ export async function extractZipToVault(
 
 	// Iterate through each file in the zip
 	const fileEntries = Object.entries(zip.files);
-	console.info(`Extracting ${fileEntries.length} files to vault`);
+	console.debug(`Extracting ${fileEntries.length} files to vault`);
 
 	for (const [relativePath, zipEntry] of fileEntries) {
 		if (!zipEntry.dir) {
@@ -128,7 +128,7 @@ export async function extractZipToVault(
 
 			// Write the file to the vault
 			await app.vault.adapter.writeBinary(fullPath, fileData);
-			console.info("Wrote file", fullPath);
+			console.debug("Wrote file", fullPath);
 		}
 	}
 	console.groupEnd();
@@ -139,7 +139,7 @@ export async function deleteAllVaultFiles(app: App): Promise<void> {
 
 	// Get all files in the vault
 	const files = app.vault.getFiles();
-	console.info(`Deleting ${files.length} files from vault`);
+	console.debug(`Deleting ${files.length} files from vault`);
 
 	// Delete each file directly via adapter (bypasses vault events/listeners)
 	let filesDeleted = 0;
@@ -152,11 +152,11 @@ export async function deleteAllVaultFiles(app: App): Promise<void> {
 			throw e;
 		}
 	}
-	console.info(`Deleted ${filesDeleted} files from vault`);
+	console.debug(`Deleted ${filesDeleted} files from vault`);
 
 	// After deleting files, check for remaining folders
 	const folders = await getAllFolders(app);
-	console.info(`Found ${folders.length} folders to delete from vault`);
+	console.debug(`Found ${folders.length} folders to delete from vault`);
 
 	// Sort folders by depth (deepest first) to avoid deleting parent before children
 	const sortedFolders = folders.sort(
@@ -174,7 +174,7 @@ export async function deleteAllVaultFiles(app: App): Promise<void> {
 			throw e;
 		}
 	}
-	console.info(`Deleted ${foldersDeleted} folders from vault`);
+	console.debug(`Deleted ${foldersDeleted} folders from vault`);
 	console.groupEnd();
 }
 

@@ -172,7 +172,7 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 				`Failed to load vaults with status ${downloadBackupFetchRes.status}`
 			);
 		}
-		console.info("Fetched download URL");
+		console.debug("Fetched download URL");
 
 		const downloadBackupRes: DownloadBackupResponse =
 			await downloadBackupFetchRes.json();
@@ -181,17 +181,17 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 		const tmpFilePath = normalizePath(`/vault-backup-${backupId}.zip`);
 
 		await deleteAllVaultFiles(this._app);
-		console.info("Cleared vault files");
+		console.debug("Cleared vault files");
 
 		await downloadVaultZip(this._app, downloadUrl, tmpFilePath);
 
-		console.info("Downloaded to:", tmpFilePath);
+		console.debug("Downloaded to:", tmpFilePath);
 
 		await extractZipToVault(this._app, tmpFilePath, "/");
-		console.info("Extracted backup to vault");
+		console.debug("Extracted backup to vault");
 
 		await this._app.vault.adapter.remove(tmpFilePath);
-		console.info("Removed temp file:", tmpFilePath);
+		console.debug("Removed temp file:", tmpFilePath);
 
 		console.groupEnd();
 	}
