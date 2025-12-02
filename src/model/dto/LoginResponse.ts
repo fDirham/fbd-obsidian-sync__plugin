@@ -3,4 +3,5 @@ export interface LoginResponse {
 	refreshToken: string;
 	idToken: string;
 	expiresIn: number;
+	isVerified: boolean;
 }

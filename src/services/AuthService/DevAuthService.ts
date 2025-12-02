@@ -45,7 +45,7 @@ export default class DevAuthService extends AuthService {
 		await sleepPromise(1000);
 
 		// Mock generic success for now
-		this._ags.authCreds.value = Mock_LoginResponse_Success;
+		this._ags.authCreds.value = { ...Mock_LoginResponse_Success, email };
 		this._ags.authStatus.value = AuthStatus.LOGGED_IN;
 
 		this._app.saveLocalStorage(
@@ -60,6 +60,19 @@ export default class DevAuthService extends AuthService {
 	}
 
 	async checkAndRefreshToken(): Promise<AuthCreds> {
-		return Mock_LoginResponse_Success;
+		return {
+			...Mock_LoginResponse_Success,
+			email: this._ags.authCreds.value?.email || "",
+		};
+	}
+
+	signUp(email: string, password: string): Promise<void> {
+		throw new Error("Method not implemented.");
+	}
+	sendPasswordResetEmail(email: string): Promise<void> {
+		throw new Error("Method not implemented.");
+	}
+	verifyEmail(token: string): Promise<void> {
+		throw new Error("Method not implemented.");
 	}
 }

@@ -6,6 +6,7 @@ export const Mock_LoginResponse_Success: LoginResponse = {
 	refreshToken: "placeholder_refreshToken",
 	idToken: "placeholder_idToken",
 	expiresIn: 3600,
+	isVerified: true,
 };
 
 export const Mock_GetVaultsResponse_Success: GetVaultsResponse = {

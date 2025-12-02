@@ -63,7 +63,7 @@ export default class LocalhostAuthService extends AuthService {
 
 		const loginRes: LoginResponse = await fetchRes.json();
 
-		this._ags.authCreds.value = loginRes;
+		this._ags.authCreds.value = { ...loginRes, email };
 		this._ags.authStatus.value = AuthStatus.LOGGED_IN;
 		this._app.saveLocalStorage(
 			LocalStorageKeys.CREDS,
@@ -92,6 +92,14 @@ export default class LocalhostAuthService extends AuthService {
 				return currentCreds;
 			}
 
+			const currEmail: string | null =
+				this._ags.authCreds.value?.email || null;
+			if (!currEmail) {
+				throw new Error(
+					"Cannot refresh token: missing email in current creds"
+				);
+			}
+
 			console.debug("Refreshing token");
 			// Otherwise, refresh the token
 			const fetchRes = await fetch(`${API_URL}/refresh`, {
@@ -113,7 +121,7 @@ export default class LocalhostAuthService extends AuthService {
 
 			const refreshRes: LoginResponse = await fetchRes.json();
 
-			const newCreds: AuthCreds = refreshRes;
+			const newCreds: AuthCreds = { ...refreshRes, email: currEmail };
 
 			this._ags.authCreds.value = newCreds;
 
@@ -127,5 +135,15 @@ export default class LocalhostAuthService extends AuthService {
 		} catch (e) {
 			throw new Error("Couldn't parse access token");
 		}
+	}
+
+	signUp(email: string, password: string): Promise<void> {
+		throw new Error("Method not implemented.");
+	}
+	sendPasswordResetEmail(email: string): Promise<void> {
+		throw new Error("Method not implemented.");
+	}
+	verifyEmail(token: string): Promise<void> {
+		throw new Error("Method not implemented.");
 	}
 }
