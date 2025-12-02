@@ -66,13 +66,43 @@ export default class DevAuthService extends AuthService {
 		};
 	}
 
-	signUp(email: string, password: string): Promise<void> {
-		throw new Error("Method not implemented.");
+	async sendResetPasswordEmail(email: string): Promise<void> {
+		console.log(`Mock: sending password reset email to ${email}`);
+		await sleepPromise(500);
 	}
-	sendPasswordResetEmail(email: string): Promise<void> {
-		throw new Error("Method not implemented.");
+
+	async confirmResetPassword(
+		email: string,
+		newPassword: string,
+		code: string
+	): Promise<boolean> {
+		console.log(
+			`Mock: confirming password reset for ${email} with code ${code}`
+		);
+		await sleepPromise(500);
+		return true;
 	}
-	verifyEmail(token: string): Promise<void> {
-		throw new Error("Method not implemented.");
+
+	async confirmVerify(email: string, code: string): Promise<boolean> {
+		console.log(
+			`Mock: confirming email verification for ${email} with code ${code}`
+		);
+		await sleepPromise(500);
+		return true;
+	}
+
+	async sendVerificationEmail(email: string): Promise<void> {
+		console.log(`Mock: sending verification email to ${email}`);
+		await sleepPromise(500);
+	}
+
+	async signUp(email: string, password: string): Promise<void> {
+		console.log(`Mock: signing up user with email ${email}`);
+		await sleepPromise(1000);
+	}
+
+	async verifyEmail(token: string): Promise<void> {
+		console.log(`Mock: verifying email with token ${token}`);
+		await sleepPromise(500);
 	}
 }

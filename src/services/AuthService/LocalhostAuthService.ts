@@ -7,8 +7,12 @@ import { LoginResponse } from "src/model/dto/LoginResponse";
 import { IdTokenDecoded } from "src/model/IdTokenDecoded";
 import { LoginRequest } from "src/model/dto/LoginRequest";
 import { RefreshTokenRequest } from "src/model/dto/RefreshTokenRequest";
-
-const API_URL = "http://localhost:3000/user";
+import { SignUpRequest } from "src/model/dto/SignUpRequest";
+import { SendResetPasswordEmailRequest } from "src/model/dto/SendResetPasswordEmailRequest";
+import { ConfirmResetPasswordRequest } from "src/model/dto/ConfirmResetPasswordRequest";
+import { SendVerificationEmailRequest } from "src/model/dto/SendVerificationEmailRequest";
+import { ConfirmVerifyUserRequest } from "src/model/dto/ConfirmVerifyUserRequest";
+import AppAPIRoutes from "src/model/AppAPIRoutes";
 
 export default class LocalhostAuthService extends AuthService {
 	private _ags: AppGlobalState;
@@ -43,7 +47,7 @@ export default class LocalhostAuthService extends AuthService {
 
 	async login(email: string, password: string) {
 		const loginRes = await typedFetch<LoginRequest, LoginResponse>(
-			`${API_URL}/login`,
+			AppAPIRoutes.LOGIN,
 			{ method: "POST" },
 			{ email, password }
 		);
@@ -87,7 +91,7 @@ export default class LocalhostAuthService extends AuthService {
 				RefreshTokenRequest,
 				LoginResponse
 			>(
-				`${API_URL}/refresh`,
+				AppAPIRoutes.REFRESH_TOKEN,
 				{ method: "POST" },
 				{
 					uid: decoded.sub,
@@ -107,13 +111,58 @@ export default class LocalhostAuthService extends AuthService {
 		}
 	}
 
-	signUp(email: string, password: string): Promise<void> {
-		throw new Error("Method not implemented.");
+	async signUp(email: string, password: string): Promise<void> {
+		await typedFetch<SignUpRequest, void>(
+			AppAPIRoutes.SIGN_UP,
+			{ method: "POST" },
+			{ email, password }
+		);
 	}
-	sendPasswordResetEmail(email: string): Promise<void> {
-		throw new Error("Method not implemented.");
+
+	async sendResetPasswordEmail(email: string): Promise<void> {
+		await typedFetch<SendResetPasswordEmailRequest, void>(
+			AppAPIRoutes.SEND_RESET_PASSWORD_EMAIL,
+			{ method: "POST" },
+			{ email }
+		);
 	}
-	verifyEmail(token: string): Promise<void> {
-		throw new Error("Method not implemented.");
+	async confirmResetPassword(
+		email: string,
+		newPassword: string,
+		code: string
+	): Promise<boolean> {
+		try {
+			await typedFetch<ConfirmResetPasswordRequest, void>(
+				AppAPIRoutes.CONFIRM_RESET_PASSWORD,
+				{ method: "POST" },
+				{ email, newPassword, code }
+			);
+			return true;
+		} catch (e) {
+			console.error("Error confirming reset password:", e);
+			return false;
+		}
+	}
+
+	async sendVerificationEmail(email: string): Promise<void> {
+		await typedFetch<SendVerificationEmailRequest, void>(
+			AppAPIRoutes.SEND_VERIFICATION_EMAIL,
+			{ method: "POST" },
+			{ email }
+		);
+	}
+
+	async confirmVerify(email: string, code: string): Promise<boolean> {
+		try {
+			await typedFetch<ConfirmVerifyUserRequest, void>(
+				AppAPIRoutes.CONFIRM_VERIFY_USER,
+				{ method: "POST" },
+				{ email, code }
+			);
+			return true;
+		} catch (e) {
+			console.error("Error confirming email verification:", e);
+			return false;
+		}
 	}
 }
