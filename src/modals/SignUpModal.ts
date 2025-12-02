@@ -1,25 +1,14 @@
 import { App, Modal, Setting } from "obsidian";
-import AppPlugin from "src/AppPlugin/AppPlugin";
-import { AuthStatus } from "src/model/AuthStatus";
-import LogInModal from "./LogInModal";
 
 export default class SignUpModal extends Modal {
-	plugin: AppPlugin;
-
-	constructor(app: App, plugin: AppPlugin) {
+	constructor(
+		app: App,
+		onLogIn: () => void,
+		onSubmit: (email: string, password: string) => void
+	) {
 		super(app);
-		this.plugin = plugin;
 
 		this.setTitle("Sign up");
-
-		this.plugin.appGlobalState.authStatus.addListener(
-			"signupmodal",
-			(_, newVal) => {
-				if (newVal != AuthStatus.LOGGED_OUT) {
-					this.close();
-				}
-			}
-		);
 
 		let email = "";
 		new Setting(this.contentEl).setName("Email").addText((text) =>
@@ -42,8 +31,7 @@ export default class SignUpModal extends Modal {
 				.setButtonText("Log in")
 				.setCta()
 				.onClick(() => {
-					new LogInModal(this.app, this.plugin).open();
-					this.close();
+					onLogIn();
 				})
 		);
 
@@ -52,12 +40,8 @@ export default class SignUpModal extends Modal {
 				.setButtonText("Submit")
 				.setCta()
 				.onClick(() => {
-					this.onSubmit(email, password);
+					onSubmit(email, password);
 				})
 		);
-	}
-
-	async onSubmit(email: string, password: string) {
-		await this.plugin.authService.login(email, password);
 	}
 }

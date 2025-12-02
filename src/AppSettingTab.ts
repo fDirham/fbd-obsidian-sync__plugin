@@ -4,6 +4,7 @@ import AppPlugin from "./AppPlugin/AppPlugin";
 import { AuthStatus } from "./model/AuthStatus";
 import NewVaultModal from "./modals/NewVaultModal";
 import EditVaultModal from "./modals/EditVaultModal";
+import SignUpModal from "./modals/SignUpModal";
 
 export default class AppSettingTab extends PluginSettingTab {
 	private _plugin: AppPlugin;
@@ -41,7 +42,7 @@ export default class AppSettingTab extends PluginSettingTab {
 					.setName("Not Logged In")
 					.addButton((button) =>
 						button.setButtonText("Log In").onClick(() => {
-							new LogInModal(this.app, this._plugin).open();
+							this.openLogInModal();
 						})
 					);
 				break;
@@ -142,5 +143,33 @@ export default class AppSettingTab extends PluginSettingTab {
 				break;
 			}
 		}
+	}
+
+	private openLogInModal() {
+		const loginModal = new LogInModal(
+			this.app,
+			() => {
+				loginModal.close();
+				this.openSignUpModal();
+			},
+			(email, password) => {
+				this._plugin.authService.login(email, password);
+			}
+		);
+		loginModal.open();
+	}
+
+	private openSignUpModal() {
+		const signUpModal = new SignUpModal(
+			this.app,
+			() => {
+				signUpModal.close();
+				this.openLogInModal();
+			},
+			(email, password) => {
+				this._plugin.authService.signUp(email, password);
+			}
+		);
+		signUpModal.open();
 	}
 }
