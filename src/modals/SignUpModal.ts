@@ -1,19 +1,19 @@
 import { App, Modal, Setting } from "obsidian";
 import AppPlugin from "src/AppPlugin/AppPlugin";
 import { AuthStatus } from "src/model/AuthStatus";
-import SignUpModal from "./SignupModal";
+import LogInModal from "./LogInModal";
 
-export default class LogInModal extends Modal {
+export default class SignUpModal extends Modal {
 	plugin: AppPlugin;
 
 	constructor(app: App, plugin: AppPlugin) {
 		super(app);
 		this.plugin = plugin;
 
-		this.setTitle("Log in");
+		this.setTitle("Sign up");
 
 		this.plugin.appGlobalState.authStatus.addListener(
-			"loginmodal",
+			"signupmodal",
 			(_, newVal) => {
 				if (newVal != AuthStatus.LOGGED_OUT) {
 					this.close();
@@ -39,10 +39,10 @@ export default class LogInModal extends Modal {
 
 		new Setting(this.contentEl).addButton((btn) =>
 			btn
-				.setButtonText("Sign up")
+				.setButtonText("Log in")
 				.setCta()
 				.onClick(() => {
-					new SignUpModal(this.app, this.plugin).open();
+					new LogInModal(this.app, this.plugin).open();
 					this.close();
 				})
 		);
