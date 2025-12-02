@@ -1,4 +1,3 @@
-import { sleepPromise } from "src/utils";
 import AppVaultsService from "./AppVaultsService";
 import AppGlobalState from "../AppGlobalState/AppGlobalState";
 import { AppVault } from "src/model/AppVault";
@@ -198,7 +197,28 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 	}
 
 	async deleteBackup(vaultId: string, backupId: string): Promise<void> {
-		await sleepPromise(500);
+		const creds = this._ags.authCreds.value;
+		if (!creds) {
+			throw new Error("Cannot load vaults: no auth creds");
+		}
+
+		const deleteBackupFetchRes = await fetch(
+			`${API_URL}/backup?b=${backupId}`,
+			{
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${creds.token}`,
+				},
+			}
+		);
+
+		if (!deleteBackupFetchRes.ok) {
+			throw new Error(
+				`Failed to load vaults with status ${deleteBackupFetchRes.status}`
+			);
+		}
+
 		const vaults = this._ags.vaults.value;
 		this._ags.vaults.value = vaults.map((v) => {
 			if (v.id === vaultId) {
@@ -235,9 +255,7 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 		const startBackupRes: StartBackupResponse =
 			await startBackupFetchRes.json();
 
-		await uploadVaultZip(this._app, startBackupRes.presignedUrl, (prog) => {
-			console.log("Upload progress:", prog);
-		});
+		await uploadVaultZip(this._app, startBackupRes.presignedUrl);
 
 		const checkVaultBackupsFetchRes = await fetch(`${API_URL}/check`, {
 			method: "POST",
