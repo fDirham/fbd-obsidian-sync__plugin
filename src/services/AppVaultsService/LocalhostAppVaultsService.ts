@@ -20,8 +20,7 @@ import { CheckBackupRequest } from "src/model/dto/CheckBackupRequest";
 import { DeleteBackupQueryParams } from "src/model/dto/DeleteBackupQueryParams";
 import { GetBackupUrlResponse } from "src/model/dto/GetBackupUrlResponse";
 import { GetBackupUrlQueryParams } from "src/model/dto/GetBackupUrlQueryParams";
-
-const API_URL = "http://localhost:3000/vault";
+import AppAPIRoutes from "src/model/AppAPIRoutes";
 
 export default class LocalhostAppVaultsService extends AppVaultsService {
 	private _ags: AppGlobalState;
@@ -44,7 +43,7 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 		}
 
 		const vaultsResponse = await typedFetch<never, GetVaultsResponse>(
-			`${API_URL}`,
+			AppAPIRoutes.VAULTS,
 			{
 				method: "GET",
 				headers: {
@@ -72,7 +71,7 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			CreateVaultRequest,
 			CreateVaultResponse
 		>(
-			`${API_URL}`,
+			AppAPIRoutes.VAULTS,
 			{
 				method: "POST",
 				headers: {
@@ -97,7 +96,7 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
 
-		await typedFetch<never, void>(`${API_URL}/${vaultId}`, {
+		await typedFetch<never, void>(AppAPIRoutes.VAULT_BY_ID(vaultId), {
 			method: "DELETE",
 			headers: {
 				Authorization: `Bearer ${creds.token}`,
@@ -119,7 +118,7 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 		}
 
 		await typedFetch<RenameVaultRequest, void>(
-			`${API_URL}`,
+			AppAPIRoutes.VAULTS,
 			{
 				method: "PUT",
 				headers: {
@@ -148,7 +147,7 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			GetBackupUrlResponse,
 			GetBackupUrlQueryParams
 		>(
-			`${API_URL}/backup`,
+			AppAPIRoutes.BACKUP,
 			{
 				method: "GET",
 				headers: {
@@ -186,7 +185,7 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 		}
 
 		await typedFetch<never, void, DeleteBackupQueryParams>(
-			`${API_URL}/backup`,
+			AppAPIRoutes.BACKUP,
 			{
 				method: "DELETE",
 				headers: {
@@ -219,7 +218,7 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			StartBackupRequest,
 			StartBackupResponse
 		>(
-			`${API_URL}/backup`,
+			AppAPIRoutes.BACKUP,
 			{
 				method: "POST",
 				headers: {
@@ -235,7 +234,7 @@ export default class LocalhostAppVaultsService extends AppVaultsService {
 			CheckBackupRequest,
 			CheckVaultBackupsResponse
 		>(
-			`${API_URL}/check`,
+			AppAPIRoutes.CHECK_BACKUP,
 			{
 				method: "POST",
 				headers: {
