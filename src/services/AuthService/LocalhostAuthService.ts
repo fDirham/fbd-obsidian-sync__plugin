@@ -101,7 +101,7 @@ export default class LocalhostAuthService extends AuthService {
 				},
 				body: JSON.stringify({
 					uid: decoded.sub,
-					email: decoded.email,
+					refreshToken: currentCreds.refreshToken,
 				}),
 			});
 
