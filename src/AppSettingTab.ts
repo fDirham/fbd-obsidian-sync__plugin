@@ -1,21 +1,10 @@
-import { App, Notice, PluginSettingTab, Setting } from "obsidian";
-import LogInModal from "./modals/LogInModal";
+import { App, PluginSettingTab, Setting } from "obsidian";
 import AppPlugin from "./AppPlugin/AppPlugin";
 import { AuthStatus } from "./model/AuthStatus";
-import NewVaultModal from "./modals/NewVaultModal";
-import EditVaultModal from "./modals/EditVaultModal";
-import SignUpModal from "./modals/SignUpModal";
-import VerifyEmailModal from "./modals/VerifyEmailModal";
-import AskEmailForVerifyModal from "./modals/AskEmailForVerifyModal";
-import AskEmailForResetPasswordModal from "./modals/AskEmailForResetPasswordModal";
-import ResetPasswordFormModal from "./modals/ResetPasswordFormModal";
 
 export default class AppSettingTab extends PluginSettingTab {
-	private _plugin: AppPlugin;
-
-	constructor(app: App, plugin: AppPlugin) {
+	constructor(app: App, private plugin: AppPlugin) {
 		super(app, plugin);
-		this._plugin = plugin;
 
 		const { authStatus, vaults, chosenVaultId } = plugin.appGlobalState;
 
@@ -38,7 +27,7 @@ export default class AppSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName("FBD Obsidian Sync").setHeading();
 
 		const { authStatus, vaults, chosenVaultId } =
-			this._plugin.appGlobalState;
+			this.plugin.appGlobalState;
 
 		switch (authStatus.value) {
 			case AuthStatus.LOGGED_OUT: {
@@ -46,7 +35,7 @@ export default class AppSettingTab extends PluginSettingTab {
 					.setName("Not Logged In")
 					.addButton((button) =>
 						button.setButtonText("Log In").onClick(() => {
-							this.openLogInModal();
+							this.plugin.modalOrchestratorService.openLogInModal();
 						})
 					);
 				break;
@@ -70,10 +59,7 @@ export default class AppSettingTab extends PluginSettingTab {
 						dropdown.setValue(selectedVaultId);
 						dropdown.onChange((value) => {
 							if (value === "add") {
-								new NewVaultModal(
-									this.app,
-									this._plugin
-								).open();
+								this.plugin.modalOrchestratorService.openNewVaultModal();
 								return;
 							}
 							chosenVaultId.value = value;
@@ -86,7 +72,7 @@ export default class AppSettingTab extends PluginSettingTab {
 						.setHeading()
 						.addButton((button) =>
 							button.setButtonText("Upload").onClick(() => {
-								this._plugin.appVaultsService.uploadBackup(
+								this.plugin.appVaultsService.uploadBackup(
 									selectedVault.id
 								);
 							})
@@ -100,14 +86,14 @@ export default class AppSettingTab extends PluginSettingTab {
 							)
 							.addButton((button) =>
 								button.setButtonText("Restore").onClick(() => {
-									this._plugin.appVaultsService.downloadBackup(
+									this.plugin.appVaultsService.downloadBackup(
 										backup.id
 									);
 								})
 							)
 							.addButton((button) =>
 								button.setButtonText("Delete").onClick(() => {
-									this._plugin.appVaultsService.deleteBackup(
+									this.plugin.appVaultsService.deleteBackup(
 										selectedVault.id,
 										backup.id
 									);
@@ -119,25 +105,23 @@ export default class AppSettingTab extends PluginSettingTab {
 						.setName("Vault actions")
 						.addButton((button) =>
 							button.setButtonText("Delete").onClick(() => {
-								this._plugin.appVaultsService.deleteVault(
+								this.plugin.appVaultsService.deleteVault(
 									selectedVault.id
 								);
 							})
 						)
 						.addButton((button) =>
 							button.setButtonText("Rename").onClick(() => {
-								new EditVaultModal(
-									this.app,
-									this._plugin,
+								this.plugin.modalOrchestratorService.openEditVaultModal(
 									selectedVault
-								).open();
+								);
 							})
 						);
 				}
 
 				new Setting(containerEl).setName("").addButton((button) =>
 					button.setButtonText("Log Out").onClick(() => {
-						this._plugin.authService.logout();
+						this.plugin.authService.logout();
 					})
 				);
 
@@ -147,154 +131,5 @@ export default class AppSettingTab extends PluginSettingTab {
 				break;
 			}
 		}
-	}
-
-	private openLogInModal() {
-		const loginModal = new LogInModal(
-			this.app,
-			() => {
-				loginModal.close();
-				this.openSignUpModal();
-			},
-			() => {
-				loginModal.close();
-				this.openAskEmailForVerifyModal();
-			},
-			() => {
-				loginModal.close();
-				this.openAskEmailForResetPasswordModal();
-			},
-			async (email, password) => {
-				try {
-					const { isVerified } = await this._plugin.authService.login(
-						email,
-						password
-					);
-					if (!isVerified) {
-						new Notice(
-							"Please verify your email before logging in."
-						);
-						return;
-					}
-					loginModal.close();
-				} catch (e) {
-					new Notice("Login failed: " + (e as Error).message);
-				}
-			}
-		);
-		loginModal.open();
-	}
-
-	private openSignUpModal() {
-		const signUpModal = new SignUpModal(
-			this.app,
-			() => {
-				signUpModal.close();
-				this.openLogInModal();
-			},
-			async (email, password) => {
-				try {
-					await this._plugin.authService.signUp(email, password);
-					signUpModal.close();
-					new Notice("Email confirmation sent!");
-					this.openVerifyEmailModal(email);
-				} catch (e) {
-					new Notice("Sign up failed: " + (e as Error).message);
-				}
-			}
-		);
-		signUpModal.open();
-	}
-
-	private openAskEmailForVerifyModal() {
-		const modal = new AskEmailForVerifyModal(this.app, async (email) => {
-			try {
-				await this._plugin.authService.sendVerificationEmail(email);
-				new Notice("Verification email sent!");
-				modal.close();
-				this.openVerifyEmailModal(email);
-			} catch (e) {
-				new Notice("Send failed: " + (e as Error).message);
-			}
-		});
-		modal.open();
-	}
-
-	private openVerifyEmailModal(email: string) {
-		const modal = new VerifyEmailModal(
-			this.app,
-			email,
-			async (email) => {
-				try {
-					await this._plugin.authService.sendVerificationEmail(email);
-					new Notice("Verification email sent!");
-				} catch (e) {
-					new Notice("Resend failed: " + (e as Error).message);
-				}
-			},
-			async (email, code) => {
-				try {
-					await this._plugin.authService.confirmVerify(email, code);
-					modal.close();
-					new Notice("Email verified! You can now log in.");
-					this.openLogInModal();
-				} catch (e) {
-					new Notice("Verification failed: " + (e as Error).message);
-				}
-			}
-		);
-
-		modal.open();
-	}
-
-	private openAskEmailForResetPasswordModal() {
-		const modal = new AskEmailForResetPasswordModal(
-			this.app,
-			async (email) => {
-				try {
-					await this._plugin.authService.sendResetPasswordEmail(
-						email
-					);
-					new Notice("Reset password email sent!");
-					modal.close();
-					this.openResetPasswordFormModal(email);
-				} catch (e) {
-					new Notice("Send failed: " + (e as Error).message);
-				}
-			}
-		);
-		modal.open();
-	}
-
-	private openResetPasswordFormModal(email: string) {
-		const modal = new ResetPasswordFormModal(
-			this.app,
-			email,
-			async (email: string) => {
-				try {
-					await this._plugin.authService.sendResetPasswordEmail(
-						email
-					);
-					new Notice("Reset password email sent!");
-				} catch (e) {
-					new Notice("Send failed: " + (e as Error).message);
-				}
-			},
-			async (email, code, newPassword) => {
-				try {
-					await this._plugin.authService.confirmResetPassword(
-						email,
-						code,
-						newPassword
-					);
-					modal.close();
-					new Notice("Password reset! You can now log in.");
-					this.openLogInModal();
-				} catch (e) {
-					new Notice("Reset failed: " + (e as Error).message);
-				}
-			}
-		);
-		modal.open();
 	}
 }
