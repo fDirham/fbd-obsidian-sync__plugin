@@ -12,14 +12,18 @@ export default class AskEmailModal extends Modal {
 		this.setTitle(title);
 
 		let email = "";
-		new Setting(this.contentEl).setName("Email").addText((text) =>
-			text.onChange((value) => {
-				email = value;
-			})
-		);
+		const emailSet = new Setting(this.contentEl)
+			.setName("Email")
+			.addText((text) =>
+				text
+					.onChange((value) => {
+						email = value;
+					})
+					.setPlaceholder("your@email.com")
+			);
 
 		if (subtitle) {
-			new Setting(this.contentEl).setDesc(subtitle);
+			emailSet.setDesc(subtitle);
 		}
 
 		new Setting(this.contentEl).addButton((btn) =>
