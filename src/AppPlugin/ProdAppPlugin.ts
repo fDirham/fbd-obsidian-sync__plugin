@@ -6,6 +6,7 @@ import { AuthStatus } from "src/model/AuthStatus";
 import AppData from "src/model/AppData";
 import LocalhostAuthService from "src/services/AuthService/LocalhostAuthService";
 import LocalhostAppVaultsService from "src/services/AppVaultsService/LocalhostAppVaultsService";
+import { RIBBON_ICON_SVG } from "src/ribbonIconSvg";
 // import DevAuthService from "src/services/AuthService/DevAuthService";
 // import DevAppVaultsService from "src/services/AppVaultsService/DevAppVaultsService";
 
@@ -38,11 +39,17 @@ export default class ProdAppPlugin extends AppPlugin {
 		await this.loadSettings();
 		await this.authService.load();
 
-		// Use this for simple tests
-		// this.addRibbonIcon("dice", "Vault Manager", () => {
-		// 	// testUpload(this.app);
-		// });
-		this.addSettingTab(new AppSettingTab(this.app, this));
+		const settingTab = new AppSettingTab(this.app, this);
+		this.addSettingTab(settingTab);
+
+		const ribbonEl = this.addRibbonIcon("dice", "Vault Manager", () => {
+			// @ts-ignore - Obsidian API
+			this.app.setting.open();
+			// @ts-ignore - Obsidian API
+			this.app.setting.openTabById(this.manifest.id);
+		});
+
+		ribbonEl.innerHTML = RIBBON_ICON_SVG;
 	}
 
 	onunload() {}
