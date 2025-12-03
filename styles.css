@@ -6,3 +6,23 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.small-button {
+	font-size: 12px;
+}
+
+.no-border-settings .setting-item {
+	border: 0;
+}
+
+.squished-setting-item .setting-item-info {
+	flex: unset;
+}
+.squished-setting-item .setting-item-control {
+	justify-content: unset;
+}
+
+.top-border {
+	border-top: 1px solid var(--background-modifier-border);
+	padding-top: 8px;
+}

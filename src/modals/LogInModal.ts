@@ -10,51 +10,29 @@ export default class LogInModal extends Modal {
 	) {
 		super(app);
 
-		this.setTitle("Log in");
+		this.setTitle("FBD Obsidian Sync Log In");
+		const topPartEl = this.contentEl.createDiv({
+			cls: "no-border-settings",
+		});
 
 		let email = "";
-		new Setting(this.contentEl).setName("Email").addText((text) =>
-			text.onChange((value) => {
-				email = value;
-			})
+		new Setting(topPartEl).setName("Email").addText((text) =>
+			text
+				.onChange((value) => {
+					email = value;
+				})
+				.setPlaceholder("your@email.com")
 		);
 
 		let password = "";
-		new Setting(this.contentEl).setName("Password").addText((text) => {
+		new Setting(topPartEl).setName("Password").addText((text) => {
 			text.onChange((value) => {
 				password = value;
 			});
-
 			text.inputEl.type = "password";
 		});
 
-		new Setting(this.contentEl)
-			.addButton((btn) =>
-				btn
-					.setButtonText("Sign up")
-					.setCta()
-					.onClick(() => {
-						onSignUp();
-					})
-			)
-			.addButton((btn) =>
-				btn
-					.setButtonText("Verify")
-					.setCta()
-					.onClick(() => {
-						onVerify();
-					})
-			)
-			.addButton((btn) =>
-				btn
-					.setButtonText("Reset password")
-					.setCta()
-					.onClick(() => {
-						onResetPassword();
-					})
-			);
-
-		new Setting(this.contentEl).addButton((btn) =>
+		new Setting(topPartEl).addButton((btn) =>
 			btn
 				.setButtonText("Log in")
 				.setCta()
@@ -62,5 +40,40 @@ export default class LogInModal extends Modal {
 					onLogIn(email, password);
 				})
 		);
+
+		const bottomPartEl = this.contentEl.createDiv({
+			cls: "no-border-settings top-border",
+		});
+		new Setting(bottomPartEl)
+			.setDesc("No account?")
+			.setClass("squished-setting-item")
+			.addButton((btn) =>
+				btn
+					.setButtonText("Sign up")
+					.onClick(() => {
+						onSignUp();
+					})
+					.setClass("small-button")
+			);
+
+		new Setting(bottomPartEl)
+			.setDesc("Need help?")
+			.setClass("squished-setting-item")
+			.addButton((btn) =>
+				btn
+					.setButtonText("Reset Password")
+					.onClick(() => {
+						onResetPassword();
+					})
+					.setClass("small-button")
+			)
+			.addButton((btn) =>
+				btn
+					.setButtonText("Verify Account")
+					.onClick(() => {
+						onVerify();
+					})
+					.setClass("small-button")
+			);
 	}
 }
