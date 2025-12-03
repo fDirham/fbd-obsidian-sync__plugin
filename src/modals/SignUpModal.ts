@@ -10,15 +10,21 @@ export default class SignUpModal extends Modal {
 
 		this.setTitle("Sign up");
 
+		const topPartEl = this.contentEl.createDiv({
+			cls: "no-border-settings",
+		});
+
 		let email = "";
-		new Setting(this.contentEl).setName("Email").addText((text) =>
-			text.onChange((value) => {
-				email = value;
-			})
+		new Setting(topPartEl).setName("Email").addText((text) =>
+			text
+				.onChange((value) => {
+					email = value;
+				})
+				.setPlaceholder("your@email.com")
 		);
 
 		let password = "";
-		new Setting(this.contentEl).setName("Password").addText((text) => {
+		new Setting(topPartEl).setName("Password").addText((text) => {
 			text.onChange((value) => {
 				password = value;
 			});
@@ -26,16 +32,7 @@ export default class SignUpModal extends Modal {
 			text.inputEl.type = "password";
 		});
 
-		new Setting(this.contentEl).addButton((btn) =>
-			btn
-				.setButtonText("Log in")
-				.setCta()
-				.onClick(() => {
-					onLogIn();
-				})
-		);
-
-		new Setting(this.contentEl).addButton((btn) =>
+		new Setting(topPartEl).addButton((btn) =>
 			btn
 				.setButtonText("Submit")
 				.setCta()
@@ -43,5 +40,21 @@ export default class SignUpModal extends Modal {
 					onSubmit(email, password);
 				})
 		);
+
+		const bottomPartEl = this.contentEl.createDiv({
+			cls: "no-border-settings top-border",
+		});
+
+		new Setting(bottomPartEl)
+			.setClass("squished-setting-item")
+			.setDesc("Already have account?")
+			.addButton((btn) =>
+				btn
+					.setButtonText("Log in")
+					.onClick(() => {
+						onLogIn();
+					})
+					.setClass("small-button")
+			);
 	}
 }
