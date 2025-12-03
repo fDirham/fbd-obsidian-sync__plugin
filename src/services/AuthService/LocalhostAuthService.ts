@@ -52,8 +52,13 @@ export default class LocalhostAuthService extends AuthService {
 			{ email, password }
 		);
 
+		if (loginRes.verified === false) {
+			return { isVerified: false };
+		}
+
 		this._ags.authCreds.value = { ...loginRes, email };
 		this._ags.authStatus.value = AuthStatus.LOGGED_IN;
+		return { isVerified: true };
 	}
 
 	async deleteAccount(): Promise<void> {
@@ -63,7 +68,11 @@ export default class LocalhostAuthService extends AuthService {
 
 	async checkAndRefreshToken(): Promise<AuthCreds> {
 		const currentCreds = this._ags.authCreds.value;
-		if (!currentCreds) {
+		if (
+			!currentCreds ||
+			!currentCreds.idToken ||
+			!currentCreds.refreshToken
+		) {
 			throw new Error("No current credentials to refresh");
 		}
 

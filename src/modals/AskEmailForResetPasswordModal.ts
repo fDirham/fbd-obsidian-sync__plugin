@@ -1,7 +1,7 @@
 import { App } from "obsidian";
 import AskEmailModal from "./AskEmailModal";
 
-export default class AskEmailForPasswordResetModal extends AskEmailModal {
+export default class AskEmailForResetPasswordModal extends AskEmailModal {
 	constructor(app: App, onSubmit: (email: string) => void) {
 		const title = "Enter your email to reset your password";
 		const subtitle =

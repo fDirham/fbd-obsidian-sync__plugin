@@ -1,10 +1,14 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import LogInModal from "./modals/LogInModal";
 import AppPlugin from "./AppPlugin/AppPlugin";
 import { AuthStatus } from "./model/AuthStatus";
 import NewVaultModal from "./modals/NewVaultModal";
 import EditVaultModal from "./modals/EditVaultModal";
 import SignUpModal from "./modals/SignUpModal";
+import VerifyEmailModal from "./modals/VerifyEmailModal";
+import AskEmailForVerifyModal from "./modals/AskEmailForVerifyModal";
+import AskEmailForResetPasswordModal from "./modals/AskEmailForResetPasswordModal";
+import ResetPasswordFormModal from "./modals/ResetPasswordFormModal";
 
 export default class AppSettingTab extends PluginSettingTab {
 	private _plugin: AppPlugin;
@@ -152,8 +156,30 @@ export default class AppSettingTab extends PluginSettingTab {
 				loginModal.close();
 				this.openSignUpModal();
 			},
-			(email, password) => {
-				this._plugin.authService.login(email, password);
+			() => {
+				loginModal.close();
+				this.openAskEmailForVerifyModal();
+			},
+			() => {
+				loginModal.close();
+				this.openAskEmailForResetPasswordModal();
+			},
+			async (email, password) => {
+				try {
+					const { isVerified } = await this._plugin.authService.login(
+						email,
+						password
+					);
+					if (!isVerified) {
+						new Notice(
+							"Please verify your email before logging in."
+						);
+						return;
+					}
+					loginModal.close();
+				} catch (e) {
+					new Notice("Login failed: " + (e as Error).message);
+				}
 			}
 		);
 		loginModal.open();
@@ -166,10 +192,109 @@ export default class AppSettingTab extends PluginSettingTab {
 				signUpModal.close();
 				this.openLogInModal();
 			},
-			(email, password) => {
-				this._plugin.authService.signUp(email, password);
+			async (email, password) => {
+				try {
+					await this._plugin.authService.signUp(email, password);
+					signUpModal.close();
+					new Notice("Email confirmation sent!");
+					this.openVerifyEmailModal(email);
+				} catch (e) {
+					new Notice("Sign up failed: " + (e as Error).message);
+				}
 			}
 		);
 		signUpModal.open();
+	}
+
+	private openAskEmailForVerifyModal() {
+		const modal = new AskEmailForVerifyModal(this.app, async (email) => {
+			try {
+				await this._plugin.authService.sendVerificationEmail(email);
+				new Notice("Verification email sent!");
+				modal.close();
+				this.openVerifyEmailModal(email);
+			} catch (e) {
+				new Notice("Send failed: " + (e as Error).message);
+			}
+		});
+		modal.open();
+	}
+
+	private openVerifyEmailModal(email: string) {
+		const modal = new VerifyEmailModal(
+			this.app,
+			email,
+			async (email) => {
+				try {
+					await this._plugin.authService.sendVerificationEmail(email);
+					new Notice("Verification email sent!");
+				} catch (e) {
+					new Notice("Resend failed: " + (e as Error).message);
+				}
+			},
+			async (email, code) => {
+				try {
+					await this._plugin.authService.confirmVerify(email, code);
+					modal.close();
+					new Notice("Email verified! You can now log in.");
+					this.openLogInModal();
+				} catch (e) {
+					new Notice("Verification failed: " + (e as Error).message);
+				}
+			}
+		);
+
+		modal.open();
+	}
+
+	private openAskEmailForResetPasswordModal() {
+		const modal = new AskEmailForResetPasswordModal(
+			this.app,
+			async (email) => {
+				try {
+					await this._plugin.authService.sendResetPasswordEmail(
+						email
+					);
+					new Notice("Reset password email sent!");
+					modal.close();
+					this.openResetPasswordFormModal(email);
+				} catch (e) {
+					new Notice("Send failed: " + (e as Error).message);
+				}
+			}
+		);
+		modal.open();
+	}
+
+	private openResetPasswordFormModal(email: string) {
+		const modal = new ResetPasswordFormModal(
+			this.app,
+			email,
+			async (email: string) => {
+				try {
+					await this._plugin.authService.sendResetPasswordEmail(
+						email
+					);
+					new Notice("Reset password email sent!");
+				} catch (e) {
+					new Notice("Send failed: " + (e as Error).message);
+				}
+			},
+			async (email, code, newPassword) => {
+				try {
+					await this._plugin.authService.confirmResetPassword(
+						email,
+						code,
+						newPassword
+					);
+					modal.close();
+					new Notice("Password reset! You can now log in.");
+					this.openLogInModal();
+				} catch (e) {
+					new Notice("Reset failed: " + (e as Error).message);
+				}
+			}
+		);
+		modal.open();
 	}
 }

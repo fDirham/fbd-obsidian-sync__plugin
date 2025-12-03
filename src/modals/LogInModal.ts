@@ -4,7 +4,9 @@ export default class LogInModal extends Modal {
 	constructor(
 		app: App,
 		onSignUp: () => void,
-		private onLogIn: (email: string, password: string) => void
+		onVerify: () => void,
+		onResetPassword: () => void,
+		onLogIn: (email: string, password: string) => void
 	) {
 		super(app);
 
@@ -26,18 +28,35 @@ export default class LogInModal extends Modal {
 			text.inputEl.type = "password";
 		});
 
-		new Setting(this.contentEl).addButton((btn) =>
-			btn
-				.setButtonText("Sign up")
-				.setCta()
-				.onClick(() => {
-					onSignUp();
-				})
-		);
+		new Setting(this.contentEl)
+			.addButton((btn) =>
+				btn
+					.setButtonText("Sign up")
+					.setCta()
+					.onClick(() => {
+						onSignUp();
+					})
+			)
+			.addButton((btn) =>
+				btn
+					.setButtonText("Verify")
+					.setCta()
+					.onClick(() => {
+						onVerify();
+					})
+			)
+			.addButton((btn) =>
+				btn
+					.setButtonText("Reset password")
+					.setCta()
+					.onClick(() => {
+						onResetPassword();
+					})
+			);
 
 		new Setting(this.contentEl).addButton((btn) =>
 			btn
-				.setButtonText("Submit")
+				.setButtonText("Log in")
 				.setCta()
 				.onClick(() => {
 					onLogIn(email, password);

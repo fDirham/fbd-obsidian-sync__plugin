@@ -6,6 +6,8 @@ import { AuthStatus } from "src/model/AuthStatus";
 import AppData from "src/model/AppData";
 import LocalhostAuthService from "src/services/AuthService/LocalhostAuthService";
 import LocalhostAppVaultsService from "src/services/AppVaultsService/LocalhostAppVaultsService";
+// import DevAuthService from "src/services/AuthService/DevAuthService";
+// import DevAppVaultsService from "src/services/AppVaultsService/DevAppVaultsService";
 
 export default class ProdAppPlugin extends AppPlugin {
 	constructor(app: App, manifest: PluginManifest) {
@@ -13,6 +15,8 @@ export default class ProdAppPlugin extends AppPlugin {
 		const ags = new ProdAppGlobalState(app, this);
 		const authService = new LocalhostAuthService(ags);
 		const appVaultsService = new LocalhostAppVaultsService(ags, app);
+		// const authService = new DevAuthService(ags, app);
+		// const appVaultsService = new DevAppVaultsService(ags);
 		this.setDependencies(ags, authService, appVaultsService);
 
 		// Register listeners

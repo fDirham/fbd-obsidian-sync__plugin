@@ -3,6 +3,6 @@ export interface AuthCreds {
 	refreshToken: string;
 	idToken: string;
 	expiresIn: number;
-	isVerified: boolean;
+	verified: boolean;
 	email: string;
 }

@@ -39,7 +39,18 @@ export async function typedFetch<
 
 	const res = await fetch(url, fetchOptions);
 	if (!res.ok) {
-		throw new Error(`Fetch failed with status ${res.status}`);
+		throw new Error(res.body ? await res.text() : res.statusText);
 	}
-	return res.json() as Promise<Output>;
+
+	const text = await res.text();
+	if (!text) {
+		return undefined as Output;
+	}
+
+	try {
+		return JSON.parse(text) as Output;
+	} catch (e) {
+		// Backend sent non-JSON response, treat as void/empty
+		return undefined as Output;
+	}
 }

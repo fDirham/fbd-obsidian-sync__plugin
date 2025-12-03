@@ -1,6 +1,5 @@
 import { App } from "obsidian";
 import { Mock_LoginResponse_Success } from "src/mockData";
-import { LocalStorageKeys } from "src/model/LocalStorageKeys";
 import { sleepPromise } from "src/utils";
 import AuthService from "./AuthService";
 import { AuthCreds } from "src/model/AuthCreds";
@@ -18,9 +17,7 @@ export default class DevAuthService extends AuthService {
 	}
 
 	async load() {
-		const credsJson: AuthCreds | null = this._app.loadLocalStorage(
-			LocalStorageKeys.CREDS
-		);
+		const credsJson = this._ags.authCreds.value;
 
 		if (credsJson) {
 			this._ags.authStatus.value = AuthStatus.LOGGED_IN;
@@ -38,7 +35,6 @@ export default class DevAuthService extends AuthService {
 	async logout() {
 		this._ags.authStatus.value = AuthStatus.LOGGED_OUT;
 		this._ags.authCreds.value = null;
-		this._app.saveLocalStorage(LocalStorageKeys.CREDS, null);
 	}
 
 	async login(email: string, password: string) {
@@ -48,10 +44,7 @@ export default class DevAuthService extends AuthService {
 		this._ags.authCreds.value = { ...Mock_LoginResponse_Success, email };
 		this._ags.authStatus.value = AuthStatus.LOGGED_IN;
 
-		this._app.saveLocalStorage(
-			LocalStorageKeys.CREDS,
-			this._ags.authCreds.value
-		);
+		return { isVerified: true };
 	}
 
 	async deleteAccount(): Promise<void> {
