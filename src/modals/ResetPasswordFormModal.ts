@@ -10,6 +10,7 @@ export default class ResetPasswordFormModal extends Modal {
 		super(app);
 
 		this.setTitle("Verify account");
+		this.containerEl.classList.add("no-border-settings");
 
 		let email = inputEmail;
 
@@ -40,20 +41,22 @@ export default class ResetPasswordFormModal extends Modal {
 
 		new Setting(this.contentEl).addButton((btn) =>
 			btn
-				.setButtonText("Resend code")
-				.setCta()
-				.onClick(() => {
-					onResendCode(email);
-				})
-		);
-
-		new Setting(this.contentEl).addButton((btn) =>
-			btn
 				.setButtonText("Submit")
 				.setCta()
 				.onClick(() => {
 					onSubmit(email, password, code);
 				})
 		);
+
+		const bottomEl = this.contentEl.createDiv({ cls: "top-border" });
+
+		new Setting(bottomEl)
+			.setClass("squished-setting-item")
+			.setDesc("Didn't receive the code?")
+			.addButton((btn) =>
+				btn.setButtonText("Resend code").onClick(() => {
+					onResendCode(email);
+				})
+			);
 	}
 }
