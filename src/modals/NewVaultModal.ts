@@ -5,6 +5,7 @@ export default class NewVaultModal extends Modal {
 		super(app);
 
 		this.setTitle("New Vault");
+		this.contentEl.classList.add("no-border-settings");
 
 		let name = "";
 		new Setting(this.contentEl).setName("Name").addText((text) =>
