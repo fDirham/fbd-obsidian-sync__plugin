@@ -16,7 +16,8 @@ export async function typedFetch<
 	url: string,
 	options: Omit<RequestInit, "body">,
 	bodyData: Input | null = null,
-	queryParams: QueryParams = {} as QueryParams
+	queryParams: QueryParams = {} as QueryParams,
+	timeout = 5000
 ): Promise<Output> {
 	const fetchOptions: RequestInit = { ...options };
 
@@ -37,20 +38,35 @@ export async function typedFetch<
 		};
 	}
 
-	const res = await fetch(url, fetchOptions);
-	if (!res.ok) {
-		throw new Error(res.body ? await res.text() : res.statusText);
-	}
-
-	const text = await res.text();
-	if (!text) {
-		return undefined as Output;
-	}
+	// Create abort controller for timeout
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), timeout);
+	fetchOptions.signal = controller.signal;
 
 	try {
-		return JSON.parse(text) as Output;
-	} catch (e) {
-		// Backend sent non-JSON response, treat as void/empty
-		return undefined as Output;
+		const res = await fetch(url, fetchOptions);
+		clearTimeout(timeoutId);
+
+		if (!res.ok) {
+			throw new Error(res.body ? await res.text() : res.statusText);
+		}
+
+		const text = await res.text();
+		if (!text) {
+			return undefined as Output;
+		}
+
+		try {
+			return JSON.parse(text) as Output;
+		} catch (e) {
+			// Backend sent non-JSON response, treat as void/empty
+			return undefined as Output;
+		}
+	} catch (error) {
+		clearTimeout(timeoutId);
+		if (error instanceof Error && error.name === "AbortError") {
+			throw new Error(`Request timed out after ${timeout}ms`);
+		}
+		throw error;
 	}
 }

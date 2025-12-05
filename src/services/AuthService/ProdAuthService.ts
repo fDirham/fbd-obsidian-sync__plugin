@@ -115,7 +115,9 @@ export default class ProdAuthService extends AuthService {
 					uid: decoded.sub,
 					refreshToken: currentCreds.refreshToken,
 					email: currEmail,
-				}
+				},
+				undefined,
+				3000 // Shorter timeout since we use this onload
 			);
 
 			const newCreds: AuthCreds = { ...refreshRes, email: currEmail };
