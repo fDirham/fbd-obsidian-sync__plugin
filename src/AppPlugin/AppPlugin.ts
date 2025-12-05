@@ -1,8 +1,11 @@
 import { App, Plugin, PluginManifest } from "obsidian";
+import AppSettingTab from "src/AppSettingTab";
+import { AuthStatus } from "src/model/AuthStatus";
 import AppGlobalState from "src/services/AppGlobalState/AppGlobalState";
 import AppVaultsService from "src/services/AppVaultsService/AppVaultsService";
 import AuthService from "src/services/AuthService/AuthService";
 import ModalOrchestratorService from "src/services/ModalOrchestratorService/ModalOrchestratorService";
+import { RIBBON_ICON_SVG } from "src/svgs/ribbonIconSvg";
 
 export default abstract class AppPlugin extends Plugin {
 	private _authService: AuthService;
@@ -12,9 +15,36 @@ export default abstract class AppPlugin extends Plugin {
 
 	constructor(app: App, manifest: PluginManifest) {
 		super(app, manifest);
+
+		const [
+			appGlobalState,
+			authService,
+			appVaultsService,
+			modalOrchestratorService,
+		] = this.getDependencies();
+
+		this.setDependencies(
+			appGlobalState,
+			authService,
+			appVaultsService,
+			modalOrchestratorService
+		);
+
+		// Register listeners
+		this.appGlobalState.authStatus.addListener(
+			"loadAndClearVaultsOnAuth",
+			(oldVal, newVal) => {
+				if (newVal == AuthStatus.LOGGED_IN) {
+					this.appVaultsService.loadVaults();
+				} else {
+					this.appVaultsService.clearVaults();
+				}
+			}
+		);
+		appGlobalState.assignDataAndValuesListeners();
 	}
 
-	setDependencies(
+	private setDependencies(
 		appGlobalState: AppGlobalState,
 		authService: AuthService,
 		appVaultsService: AppVaultsService,
@@ -25,6 +55,13 @@ export default abstract class AppPlugin extends Plugin {
 		this._appVaultsService = appVaultsService;
 		this._modalOrchestratorService = modalOrchestratorService;
 	}
+
+	abstract getDependencies(): [
+		AppGlobalState,
+		AuthService,
+		AppVaultsService,
+		ModalOrchestratorService
+	];
 
 	get authService() {
 		return this._authService;
@@ -40,5 +77,34 @@ export default abstract class AppPlugin extends Plugin {
 
 	get modalOrchestratorService() {
 		return this._modalOrchestratorService;
+	}
+
+	async onload() {
+		this.appGlobalState.loadAllLocalStorage();
+		await this.appGlobalState.loadAllData();
+		await this.authService.load();
+
+		const settingTab = new AppSettingTab(this.app, this);
+		this.addSettingTab(settingTab);
+
+		// Ribbon
+		const ribbonEl = this.addRibbonIcon("dice", "Vault Manager", () => {
+			// @ts-ignore - Obsidian API
+			this.app.setting.open();
+			// @ts-ignore - Obsidian API
+			this.app.setting.openTabById(this.manifest.id);
+		});
+
+		ribbonEl.innerHTML = RIBBON_ICON_SVG;
+
+		await this.afterBaseOnload();
+	}
+
+	async afterBaseOnload() {}
+
+	onunload() {}
+
+	onExternalSettingsChange() {
+		this.appGlobalState.loadAllData();
 	}
 }

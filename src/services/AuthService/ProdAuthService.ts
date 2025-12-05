@@ -14,7 +14,7 @@ import { SendVerificationEmailRequest } from "src/model/dto/SendVerificationEmai
 import { ConfirmVerifyUserRequest } from "src/model/dto/ConfirmVerifyUserRequest";
 import AppAPIRoutes from "src/model/AppAPIRoutes";
 
-export default class LocalhostAuthService extends AuthService {
+export default class ProdAuthService extends AuthService {
 	private _ags: AppGlobalState;
 
 	constructor(ags: AppGlobalState) {

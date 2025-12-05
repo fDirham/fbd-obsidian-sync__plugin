@@ -11,7 +11,7 @@ import {
 	downloadVaultZip,
 	extractZipToVault,
 	uploadVaultZip,
-} from "./LocalhostUtils";
+} from "./ProdUtils";
 import { typedFetch } from "src/utils";
 import { CreateVaultRequest } from "src/model/dto/CreateVaultRequest";
 import { RenameVaultRequest } from "src/model/dto/RenameVaultRequest";
@@ -22,7 +22,7 @@ import { GetBackupUrlResponse } from "src/model/dto/GetBackupUrlResponse";
 import { GetBackupUrlQueryParams } from "src/model/dto/GetBackupUrlQueryParams";
 import AppAPIRoutes from "src/model/AppAPIRoutes";
 
-export default class LocalhostAppVaultsService extends AppVaultsService {
+export default class ProdAppVaultsService extends AppVaultsService {
 	private _ags: AppGlobalState;
 	private _app: App;
 

@@ -50,6 +50,7 @@ export default class DevAuthService extends AuthService {
 	async deleteAccount(): Promise<void> {
 		await sleepPromise(1000);
 		console.log("Mock delete account");
+		this.logout();
 	}
 
 	async checkAndRefreshToken(): Promise<AuthCreds> {
