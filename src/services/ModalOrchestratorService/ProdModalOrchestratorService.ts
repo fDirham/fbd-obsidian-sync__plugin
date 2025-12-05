@@ -200,6 +200,10 @@ export default class ProdModalOrchestratorService extends ModalOrchestratorServi
 
 				await this.appVaultsService.renameVault(appVault.id, newName);
 				modal.close();
+			},
+			async (vaultId: string) => {
+				await this.appVaultsService.deleteVault(vaultId);
+				modal.close();
 			}
 		);
 

@@ -5,7 +5,8 @@ export default class EditVaultModal extends Modal {
 	constructor(
 		app: App,
 		vault: AppVault,
-		onSubmit: (newName: string) => void
+		onSubmit: (newName: string) => void,
+		onDelete: (vaultId: string) => void
 	) {
 		super(app);
 
@@ -22,13 +23,22 @@ export default class EditVaultModal extends Modal {
 			});
 		});
 
-		new Setting(this.contentEl).addButton((btn) =>
-			btn
-				.setButtonText("Submit")
-				.setCta()
-				.onClick(() => {
-					onSubmit(newName);
-				})
-		);
+		new Setting(this.contentEl)
+			.addButton((btn) =>
+				btn
+					.setButtonText("Delete vault")
+					.onClick(() => {
+						onDelete(vault.id);
+					})
+					.setClass("fbd-sync__delete-btn")
+			)
+			.addButton((btn) =>
+				btn
+					.setButtonText("Submit")
+					.setCta()
+					.onClick(() => {
+						onSubmit(newName);
+					})
+			);
 	}
 }
