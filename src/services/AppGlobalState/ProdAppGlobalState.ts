@@ -50,6 +50,7 @@ export default class ProdAppGlobalState extends AppGlobalState {
 
 	set confirmRestoreLatestBackup(value: boolean) {
 		this._confirmRestoreLatestBackup = value;
+		this.saveDataSlice({ confirmRestoreLatestBackup: value });
 	}
 
 	get confirmRestoreSpecificBackup(): boolean {
@@ -58,6 +59,7 @@ export default class ProdAppGlobalState extends AppGlobalState {
 
 	set confirmRestoreSpecificBackup(value: boolean) {
 		this._confirmRestoreSpecificBackup = value;
+		this.saveDataSlice({ confirmRestoreSpecificBackup: value });
 	}
 
 	get confirmDeleteVault(): boolean {
@@ -66,6 +68,7 @@ export default class ProdAppGlobalState extends AppGlobalState {
 
 	set confirmDeleteVault(value: boolean) {
 		this._confirmDeleteVault = value;
+		this.saveDataSlice({ confirmDeleteVault: value });
 	}
 
 	get confirmDeleteBackup(): boolean {
@@ -74,6 +77,7 @@ export default class ProdAppGlobalState extends AppGlobalState {
 
 	set confirmDeleteBackup(value: boolean) {
 		this._confirmDeleteBackup = value;
+		this.saveDataSlice({ confirmDeleteBackup: value });
 	}
 
 	get confirmUpload(): boolean {
@@ -82,6 +86,7 @@ export default class ProdAppGlobalState extends AppGlobalState {
 
 	set confirmUpload(value: boolean) {
 		this._confirmUpload = value;
+		this.saveDataSlice({ confirmUpload: value });
 	}
 
 	async saveDataSlice(data: Partial<AppData>): Promise<void> {

@@ -22,4 +22,10 @@ export default abstract class ModalOrchestratorService {
 		onConfirm: () => void,
 		onCancel: () => void
 	): void;
+
+	abstract openConfirmModalBooleanPromise(
+		description: string
+	): Promise<boolean>;
+
+	abstract openBehaviorSettingsModal(): void;
 }

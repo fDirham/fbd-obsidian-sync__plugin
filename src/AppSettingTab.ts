@@ -4,6 +4,7 @@ import { AuthStatus } from "./model/AuthStatus";
 import { decodeJwt } from "./utils";
 import { GEAR_ICON_SVG } from "./svgs/gearIconSvg";
 import { DELETE_ICON_SVG } from "./svgs/deleteIconSvg";
+import { AppVault } from "./model/AppVault";
 
 export default class AppSettingTab extends PluginSettingTab {
 	constructor(app: App, private plugin: AppPlugin) {
@@ -52,7 +53,7 @@ export default class AppSettingTab extends PluginSettingTab {
 		}
 	}
 
-	displayLoggedIn(containerEl: HTMLElement): void {
+	private displayLoggedIn(containerEl: HTMLElement): void {
 		const { chosenVaultId, vaults, authCreds } = this.plugin.appGlobalState;
 		containerEl.classList.add("no-border-settings");
 
@@ -69,20 +70,19 @@ export default class AppSettingTab extends PluginSettingTab {
 			.setName(email)
 			.addButton((button) =>
 				button
-					.setButtonText("Delete user")
+					.setButtonText("User settings")
 					.onClick(() => {
-						this.plugin.authService.logout();
+						console.log("TODO");
+						// this.plugin.modalOrchestratorService.openUserSettingsModal();
 					})
-					.setClass("fbd-sync__delete-btn")
 					.setClass("fbd-sync__small-btn")
 			)
 			.addButton((button) =>
 				button
-					.setButtonText("Log Out")
+					.setButtonText("Behavior settings")
 					.onClick(() => {
-						this.plugin.authService.logout();
+						this.plugin.modalOrchestratorService.openBehaviorSettingsModal();
 					})
-					.setClass("fbd-sync__delete-btn")
 					.setClass("fbd-sync__small-btn")
 			);
 
@@ -148,15 +148,7 @@ export default class AppSettingTab extends PluginSettingTab {
 						.setButtonText("Restore Latest")
 						.setDisabled(selectedVault.backups.length === 0)
 						.onClick(() => {
-							const latestBackup = selectedVault.backups.reduce(
-								(prev, current) =>
-									prev.createdAt > current.createdAt
-										? prev
-										: current
-							);
-							this.plugin.appVaultsService.downloadBackup(
-								latestBackup.id
-							);
+							this.userDownloadLatestBackup(selectedVault);
 						})
 						.setClass("fbd-sync__download-btn")
 						.setClass("fbd-sync__full-width")
@@ -165,9 +157,7 @@ export default class AppSettingTab extends PluginSettingTab {
 					button
 						.setButtonText("Upload")
 						.onClick(() => {
-							this.plugin.appVaultsService.uploadBackup(
-								selectedVault.id
-							);
+							this.userUploadBackup(selectedVault.id);
 						})
 						.setClass("fbd-sync__upload-btn")
 						.setClass("fbd-sync__full-width")
@@ -184,9 +174,7 @@ export default class AppSettingTab extends PluginSettingTab {
 						button
 							.setButtonText("Restore")
 							.onClick(() => {
-								this.plugin.appVaultsService.downloadBackup(
-									backup.id
-								);
+								this.userDownloadSpecificBackup(backup.id);
 							})
 							.setClass("fbd-sync__download-btn")
 					)
@@ -197,7 +185,7 @@ export default class AppSettingTab extends PluginSettingTab {
 
 						button
 							.onClick(() => {
-								this.plugin.appVaultsService.deleteBackup(
+								this.userDeleteBackup(
 									selectedVault.id,
 									backup.id
 								);
@@ -206,5 +194,51 @@ export default class AppSettingTab extends PluginSettingTab {
 					});
 			});
 		}
+	}
+
+	private async userDownloadLatestBackup(selectedVault: AppVault) {
+		const confirmed =
+			!this.plugin.appGlobalState.confirmRestoreLatestBackup ||
+			(await this.plugin.modalOrchestratorService.openConfirmModalBooleanPromise(
+				"Are you sure you want to restore the latest backup? This will overwrite your current vault data."
+			));
+
+		if (confirmed) {
+			const latestBackup = selectedVault.backups.reduce((prev, current) =>
+				prev.createdAt > current.createdAt ? prev : current
+			);
+			this.plugin.appVaultsService.downloadBackup(latestBackup.id);
+		}
+	}
+
+	private async userUploadBackup(vaultId: string) {
+		const confirmed =
+			!this.plugin.appGlobalState.confirmUpload ||
+			(await this.plugin.modalOrchestratorService.openConfirmModalBooleanPromise(
+				"Are you sure you want to upload a new backup? This will not overwrite any existing backups."
+			));
+
+		if (confirmed) this.plugin.appVaultsService.uploadBackup(vaultId);
+	}
+
+	private async userDownloadSpecificBackup(backupId: string) {
+		const confirmed =
+			!this.plugin.appGlobalState.confirmRestoreSpecificBackup ||
+			(await this.plugin.modalOrchestratorService.openConfirmModalBooleanPromise(
+				"Are you sure you want to restore this backup? This will overwrite your current vault data."
+			));
+
+		if (confirmed) this.plugin.appVaultsService.downloadBackup(backupId);
+	}
+
+	private async userDeleteBackup(vaultId: string, backupId: string) {
+		const confirmed =
+			!this.plugin.appGlobalState.confirmDeleteBackup ||
+			(await this.plugin.modalOrchestratorService.openConfirmModalBooleanPromise(
+				"Are you sure you want to delete this backup? This action cannot be undone."
+			));
+
+		if (confirmed)
+			this.plugin.appVaultsService.deleteBackup(vaultId, backupId);
 	}
 }

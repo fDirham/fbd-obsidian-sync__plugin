@@ -13,6 +13,7 @@ import AppVaultsService from "../AppVaultsService/AppVaultsService";
 import AppGlobalState from "../AppGlobalState/AppGlobalState";
 import { AppVault } from "src/model/AppVault";
 import ConfirmModal from "src/modals/ConfirmModal";
+import BehaviorSettingsModal from "src/modals/BehaviorSettingsModal";
 
 export default class ProdModalOrchestratorService extends ModalOrchestratorService {
 	constructor(
@@ -203,11 +204,18 @@ export default class ProdModalOrchestratorService extends ModalOrchestratorServi
 				modal.close();
 			},
 			async (vaultId: string) => {
-				await this.appVaultsService.deleteVault(vaultId);
-				modal.close();
+				const confirmed =
+					!this.appGlobalState.confirmDeleteVault ||
+					(await this.openConfirmModalBooleanPromise(
+						"Are you sure you want to delete this vault? This action cannot be undone."
+					));
+
+				if (confirmed) {
+					await this.appVaultsService.deleteVault(vaultId);
+					modal.close();
+				}
 			}
 		);
-
 		modal.open();
 	}
 
@@ -227,6 +235,30 @@ export default class ProdModalOrchestratorService extends ModalOrchestratorServi
 			}
 		);
 
+		modal.open();
+	}
+
+	async openConfirmModalBooleanPromise(
+		description: string
+	): Promise<boolean> {
+		return new Promise<boolean>((resolve) => {
+			const modal = new ConfirmModal(
+				this.app,
+				description,
+				() => {
+					resolve(true);
+				},
+				() => {
+					resolve(false);
+				}
+			);
+
+			modal.open();
+		});
+	}
+
+	openBehaviorSettingsModal(): void {
+		const modal = new BehaviorSettingsModal(this.app, this.appGlobalState);
 		modal.open();
 	}
 }

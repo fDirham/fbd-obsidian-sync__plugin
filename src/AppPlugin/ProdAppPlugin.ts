@@ -65,21 +65,12 @@ export default class ProdAppPlugin extends AppPlugin {
 		ribbonEl.innerHTML = RIBBON_ICON_SVG;
 
 		// For testing
-		this.modalOrchestratorService.openConfirmModal(
-			"Bros nfgowneoun ok ayf qoewufofq",
-			() => {
-				console.log("Confirmed");
-			},
-			() => {
-				console.log("Cancelled");
-			}
-		);
-		// // @ts-ignore - Obsidian API
-		// this.app.setting.close();
-		// // @ts-ignore - Obsidian API
-		// this.app.setting.open();
-		// // @ts-ignore - Obsidian API
-		// this.app.setting.openTabById(this.manifest.id);
+		// @ts-ignore - Obsidian API
+		this.app.setting.close();
+		// @ts-ignore - Obsidian API
+		this.app.setting.open();
+		// @ts-ignore - Obsidian API
+		this.app.setting.openTabById(this.manifest.id);
 	}
 
 	onunload() {}
