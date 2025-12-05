@@ -31,8 +31,12 @@ If your plugin does not need CSS, delete this file.
 	border: 0;
 }
 
+.squished-setting-item {
+	gap: 8px;
+}
 .squished-setting-item .setting-item-info {
 	flex: unset;
+	margin-inline-end: unset;
 }
 .squished-setting-item .setting-item-control {
 	justify-content: unset;

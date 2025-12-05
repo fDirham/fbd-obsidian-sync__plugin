@@ -1,7 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import AppPlugin from "./AppPlugin/AppPlugin";
 import { AuthStatus } from "./model/AuthStatus";
-import { decodeJwt } from "./utils";
 import { GEAR_ICON_SVG } from "./svgs/gearIconSvg";
 import { DELETE_ICON_SVG } from "./svgs/deleteIconSvg";
 import { AppVault } from "./model/AppVault";
@@ -57,13 +56,7 @@ export default class AppSettingTab extends PluginSettingTab {
 		const { chosenVaultId, vaults, authCreds } = this.plugin.appGlobalState;
 		containerEl.classList.add("no-border-settings");
 
-		let email = "Unknown User";
-		try {
-			const decoded = decodeJwt(authCreds.value?.idToken || "");
-			email = decoded["email"] as string;
-		} catch (e) {
-			console.error("Failed to decode JWT", e);
-		}
+		const email = authCreds.value?.email || "Unknown user";
 
 		// User info and logout
 		new Setting(containerEl)
@@ -72,8 +65,7 @@ export default class AppSettingTab extends PluginSettingTab {
 				button
 					.setButtonText("User settings")
 					.onClick(() => {
-						console.log("TODO");
-						// this.plugin.modalOrchestratorService.openUserSettingsModal();
+						this.plugin.modalOrchestratorService.openUserSettingsModal();
 					})
 					.setClass("fbd-sync__small-btn")
 			)

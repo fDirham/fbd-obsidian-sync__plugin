@@ -14,6 +14,7 @@ import AppGlobalState from "../AppGlobalState/AppGlobalState";
 import { AppVault } from "src/model/AppVault";
 import ConfirmModal from "src/modals/ConfirmModal";
 import BehaviorSettingsModal from "src/modals/BehaviorSettingsModal";
+import UserSettingsModal from "src/modals/UserSettingsModal";
 
 export default class ProdModalOrchestratorService extends ModalOrchestratorService {
 	constructor(
@@ -259,6 +260,26 @@ export default class ProdModalOrchestratorService extends ModalOrchestratorServi
 
 	openBehaviorSettingsModal(): void {
 		const modal = new BehaviorSettingsModal(this.app, this.appGlobalState);
+		modal.open();
+	}
+
+	openUserSettingsModal(): void {
+		const modal = new UserSettingsModal(
+			this.app,
+			this.appGlobalState.authCreds.value?.email,
+			() => {
+				this.authService.logout();
+				modal.close();
+			},
+			async () => {
+				const confirmed = await this.openConfirmModalBooleanPromise(
+					"Are you sure you want to delete your account? This includes all of your backups. This action cannot be undone."
+				);
+				if (!confirmed) return;
+				this.authService.deleteAccount();
+				modal.close();
+			}
+		);
 		modal.open();
 	}
 }

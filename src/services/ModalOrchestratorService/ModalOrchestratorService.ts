@@ -28,4 +28,6 @@ export default abstract class ModalOrchestratorService {
 	): Promise<boolean>;
 
 	abstract openBehaviorSettingsModal(): void;
+
+	abstract openUserSettingsModal(): void;
 }
