@@ -18,6 +18,7 @@ export default class ProdAppGlobalState extends AppGlobalState {
 	private _confirmDeleteVault: boolean;
 	private _confirmDeleteBackup: boolean;
 	private _confirmUpload: boolean;
+	private _isOnline: ObservableValue<boolean>;
 
 	constructor(private app: App, private plugin: AppPlugin) {
 		super();
@@ -25,6 +26,7 @@ export default class ProdAppGlobalState extends AppGlobalState {
 		this._vaults = new ObservableValue<AppVault[]>([]);
 		this._authCreds = new ObservableValue<AuthCreds | null>(null);
 		this._chosenVaultId = new ObservableValue<string>("");
+		this._isOnline = new ObservableValue<boolean>(navigator.onLine);
 	}
 
 	// Getters
@@ -89,6 +91,10 @@ export default class ProdAppGlobalState extends AppGlobalState {
 		this.saveDataSlice({ confirmUpload: value });
 	}
 
+	get isOnline(): ObservableValue<boolean> {
+		return this._isOnline;
+	}
+
 	async saveDataSlice(data: Partial<AppData>): Promise<void> {
 		const currData: AppData = {
 			chosenVaultId: this.chosenVaultId.value,
@@ -127,5 +133,14 @@ export default class ProdAppGlobalState extends AppGlobalState {
 			...rawData,
 		};
 		this.onDataLoaded(appData);
+	}
+
+	assignOnlineStatusListeners(): void {
+		this.plugin.registerDomEvent(window, "online", () => {
+			this._isOnline.value = true;
+		});
+		this.plugin.registerDomEvent(window, "offline", () => {
+			this._isOnline.value = false;
+		});
 	}
 }

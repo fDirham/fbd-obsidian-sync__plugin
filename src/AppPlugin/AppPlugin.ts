@@ -29,19 +29,6 @@ export default abstract class AppPlugin extends Plugin {
 			appVaultsService,
 			modalOrchestratorService
 		);
-
-		// Register listeners
-		this.appGlobalState.authStatus.addListener(
-			"loadAndClearVaultsOnAuth",
-			(oldVal, newVal) => {
-				if (newVal == AuthStatus.LOGGED_IN) {
-					this.appVaultsService.loadVaults();
-				} else {
-					this.appVaultsService.clearVaults();
-				}
-			}
-		);
-		appGlobalState.assignDataAndValuesListeners();
 	}
 
 	private setDependencies(
@@ -80,6 +67,20 @@ export default abstract class AppPlugin extends Plugin {
 	}
 
 	async onload() {
+		// Register listeners
+		this.appGlobalState.authStatus.addListener(
+			"loadAndClearVaultsOnAuth",
+			(oldVal, newVal) => {
+				if (newVal == AuthStatus.LOGGED_IN) {
+					this.appVaultsService.loadVaults();
+				} else {
+					this.appVaultsService.clearVaults();
+				}
+			}
+		);
+		this.appGlobalState.assignDataAndValuesListeners();
+		this.appGlobalState.assignOnlineStatusListeners();
+
 		this.appGlobalState.loadAllLocalStorage();
 		await this.appGlobalState.loadAllData();
 		await this.authService.load();

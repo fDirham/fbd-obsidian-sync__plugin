@@ -9,6 +9,7 @@ export default abstract class AppGlobalState {
 	abstract get authCreds(): ObservableValue<AuthCreds | null>;
 	abstract get vaults(): ObservableValue<AppVault[]>;
 	abstract get chosenVaultId(): ObservableValue<string>;
+	abstract get isOnline(): ObservableValue<boolean>;
 	abstract get confirmRestoreLatestBackup(): boolean;
 	abstract get confirmRestoreSpecificBackup(): boolean;
 	abstract get confirmDeleteVault(): boolean;
@@ -46,6 +47,8 @@ export default abstract class AppGlobalState {
 			this.saveLocalStorage(LocalStorageKeys.CREDS, newVal);
 		});
 	}
+
+	abstract assignOnlineStatusListeners(): void;
 
 	onDataLoaded(appData: AppData) {
 		this.chosenVaultId.value = appData.chosenVaultId;

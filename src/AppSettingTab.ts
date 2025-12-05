@@ -9,7 +9,8 @@ export default class AppSettingTab extends PluginSettingTab {
 	constructor(app: App, private plugin: AppPlugin) {
 		super(app, plugin);
 
-		const { authStatus, vaults, chosenVaultId } = plugin.appGlobalState;
+		const { authStatus, vaults, chosenVaultId, isOnline } =
+			plugin.appGlobalState;
 
 		authStatus.addListener("settings", () => {
 			this.display();
@@ -20,6 +21,9 @@ export default class AppSettingTab extends PluginSettingTab {
 		chosenVaultId.addListener("settings", () => {
 			this.display();
 		});
+		isOnline.addListener("settings", () => {
+			this.display();
+		});
 	}
 
 	display(): void {
@@ -28,6 +32,11 @@ export default class AppSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl).setName("FBD Obsidian Sync").setHeading();
+
+		if (!this.plugin.appGlobalState.isOnline.value) {
+			this.displayOffline(containerEl);
+			return;
+		}
 
 		const { authStatus } = this.plugin.appGlobalState;
 
@@ -44,6 +53,14 @@ export default class AppSettingTab extends PluginSettingTab {
 				break;
 			}
 		}
+	}
+
+	private displayOffline(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName("Offline")
+			.setDesc(
+				"You are currently offline. Please check your network connection."
+			);
 	}
 
 	private displayLoggedOut(containerEl: HTMLElement): void {
