@@ -6,7 +6,7 @@ import { AuthStatus } from "src/model/AuthStatus";
 import AppData from "src/model/AppData";
 // import LocalhostAuthService from "src/services/AuthService/LocalhostAuthService";
 // import LocalhostAppVaultsService from "src/services/AppVaultsService/LocalhostAppVaultsService";
-import { RIBBON_ICON_SVG } from "src/ribbonIconSvg";
+import { RIBBON_ICON_SVG } from "src/svgs/ribbonIconSvg";
 import DevAuthService from "src/services/AuthService/DevAuthService";
 import DevAppVaultsService from "src/services/AppVaultsService/DevAppVaultsService";
 import ProdModalOrchestratorService from "src/services/ModalOrchestratorService/ProdModalOrchestratorService";

@@ -2,8 +2,8 @@ import { App, PluginSettingTab, Setting } from "obsidian";
 import AppPlugin from "./AppPlugin/AppPlugin";
 import { AuthStatus } from "./model/AuthStatus";
 import { decodeJwt } from "./utils";
-import { GEAR_ICON_SVG } from "./gearIconSvg";
-import { DELETE_ICON_SVG } from "./deleteIconSvg";
+import { GEAR_ICON_SVG } from "./svgs/gearIconSvg";
+import { DELETE_ICON_SVG } from "./svgs/deleteIconSvg";
 
 export default class AppSettingTab extends PluginSettingTab {
 	constructor(app: App, private plugin: AppPlugin) {
