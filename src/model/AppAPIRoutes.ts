@@ -12,6 +12,7 @@ const AppAPIRoutes = {
 	VAULT_BY_ID: (vaultId: string) => `${BASE_API_URL}/vault/${vaultId}`,
 	BACKUP: `${BASE_API_URL}/vault/backup`,
 	CHECK_BACKUP: `${BASE_API_URL}/vault/check`,
+	DELETE_ACCOUNT: `${BASE_API_URL}/user`,
 } as const;
 
 export default AppAPIRoutes;

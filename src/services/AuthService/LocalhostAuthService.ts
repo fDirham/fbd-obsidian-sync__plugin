@@ -1,4 +1,4 @@
-import { decodeJwt, sleepPromise, typedFetch } from "src/utils";
+import { decodeJwt, typedFetch } from "src/utils";
 import AuthService from "./AuthService";
 import { AuthCreds } from "src/model/AuthCreds";
 import AppGlobalState from "../AppGlobalState/AppGlobalState";
@@ -62,8 +62,17 @@ export default class LocalhostAuthService extends AuthService {
 	}
 
 	async deleteAccount(): Promise<void> {
-		await sleepPromise(1000);
-		console.log("Mock delete account");
+		const creds = await this.checkAndRefreshToken();
+		if (!creds) {
+			throw new Error("Cannot delete account: no auth creds");
+		}
+
+		await typedFetch<void, void>(AppAPIRoutes.DELETE_ACCOUNT, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${creds.idToken}`,
+			},
+		});
 	}
 
 	async checkAndRefreshToken(): Promise<AuthCreds> {
