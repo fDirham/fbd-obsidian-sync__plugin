@@ -33,13 +33,7 @@ export default class AppSettingTab extends PluginSettingTab {
 
 		switch (authStatus.value) {
 			case AuthStatus.LOGGED_OUT: {
-				new Setting(containerEl)
-					.setName("Not Logged In")
-					.addButton((button) =>
-						button.setButtonText("Log In").onClick(() => {
-							this.plugin.modalOrchestratorService.openLogInModal();
-						})
-					);
+				this.displayLoggedOut(containerEl);
 				break;
 			}
 			case AuthStatus.LOGGED_IN: {
@@ -50,6 +44,14 @@ export default class AppSettingTab extends PluginSettingTab {
 				break;
 			}
 		}
+	}
+
+	private displayLoggedOut(containerEl: HTMLElement): void {
+		new Setting(containerEl).setName("Not Logged In").addButton((button) =>
+			button.setButtonText("Log In or Sign Up").onClick(() => {
+				this.plugin.modalOrchestratorService.openLogInModal();
+			})
+		);
 	}
 
 	private displayLoggedIn(containerEl: HTMLElement): void {
