@@ -17,7 +17,11 @@ export default class ProdAppPlugin extends AppPlugin {
 	] {
 		const ags = new ProdAppGlobalState(this.app, this);
 		const authService = new ProdAuthService(ags);
-		const appVaultsService = new ProdAppVaultsService(ags, this.app);
+		const appVaultsService = new ProdAppVaultsService(
+			ags,
+			this.app,
+			authService
+		);
 		const modalOrchestratorService = new ProdModalOrchestratorService(
 			this.app,
 			authService,

@@ -21,12 +21,17 @@ import { DeleteBackupQueryParams } from "src/model/dto/DeleteBackupQueryParams";
 import { GetBackupUrlResponse } from "src/model/dto/GetBackupUrlResponse";
 import { GetBackupUrlQueryParams } from "src/model/dto/GetBackupUrlQueryParams";
 import AppAPIRoutes from "src/model/AppAPIRoutes";
+import AuthService from "../AuthService/AuthService";
 
 export default class ProdAppVaultsService extends AppVaultsService {
 	private _ags: AppGlobalState;
 	private _app: App;
 
-	constructor(ags: AppGlobalState, app: App) {
+	constructor(
+		ags: AppGlobalState,
+		app: App,
+		private authService: AuthService
+	) {
 		super();
 		this._ags = ags;
 		this._app = app;
@@ -37,7 +42,7 @@ export default class ProdAppVaultsService extends AppVaultsService {
 	}
 
 	async loadVaults() {
-		const creds = this._ags.authCreds.value;
+		const creds = await this.authService.checkAndRefreshToken();
 		if (!creds) {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
@@ -62,7 +67,8 @@ export default class ProdAppVaultsService extends AppVaultsService {
 	}
 
 	async createVault(vaultName: string): Promise<AppVault> {
-		const creds = this._ags.authCreds.value;
+		const creds = await this.authService.checkAndRefreshToken();
+
 		if (!creds) {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
@@ -91,7 +97,8 @@ export default class ProdAppVaultsService extends AppVaultsService {
 	}
 
 	async deleteVault(vaultId: string): Promise<void> {
-		const creds = this._ags.authCreds.value;
+		const creds = await this.authService.checkAndRefreshToken();
+
 		if (!creds) {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
@@ -112,7 +119,8 @@ export default class ProdAppVaultsService extends AppVaultsService {
 	}
 
 	async renameVault(vaultId: string, newName: string): Promise<void> {
-		const creds = this._ags.authCreds.value;
+		const creds = await this.authService.checkAndRefreshToken();
+
 		if (!creds) {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
@@ -137,7 +145,8 @@ export default class ProdAppVaultsService extends AppVaultsService {
 	async downloadBackup(backupId: string) {
 		console.group("Downloading backup: " + backupId);
 
-		const creds = this._ags.authCreds.value;
+		const creds = await this.authService.checkAndRefreshToken();
+
 		if (!creds) {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
@@ -179,7 +188,8 @@ export default class ProdAppVaultsService extends AppVaultsService {
 	}
 
 	async deleteBackup(vaultId: string, backupId: string): Promise<void> {
-		const creds = this._ags.authCreds.value;
+		const creds = await this.authService.checkAndRefreshToken();
+
 		if (!creds) {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
@@ -209,7 +219,8 @@ export default class ProdAppVaultsService extends AppVaultsService {
 	}
 
 	async uploadBackup(vaultId: string): Promise<void> {
-		const creds = this._ags.authCreds.value;
+		const creds = await this.authService.checkAndRefreshToken();
+
 		if (!creds) {
 			throw new Error("Cannot load vaults: no auth creds");
 		}
