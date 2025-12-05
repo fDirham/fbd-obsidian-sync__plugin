@@ -3,7 +3,6 @@ import AppPlugin from "./AppPlugin";
 import AppSettingTab from "src/AppSettingTab";
 import ProdAppGlobalState from "src/services/AppGlobalState/ProdAppGlobalState";
 import { AuthStatus } from "src/model/AuthStatus";
-import AppData from "src/model/AppData";
 // import LocalhostAuthService from "src/services/AuthService/LocalhostAuthService";
 // import LocalhostAppVaultsService from "src/services/AppVaultsService/LocalhostAppVaultsService";
 import { RIBBON_ICON_SVG } from "src/svgs/ribbonIconSvg";
@@ -49,12 +48,13 @@ export default class ProdAppPlugin extends AppPlugin {
 
 	async onload() {
 		this.appGlobalState.loadAllLocalStorage();
-		await this.loadSettings();
+		await this.appGlobalState.loadAllData();
 		await this.authService.load();
 
 		const settingTab = new AppSettingTab(this.app, this);
 		this.addSettingTab(settingTab);
 
+		// Ribbon
 		const ribbonEl = this.addRibbonIcon("dice", "Vault Manager", () => {
 			// @ts-ignore - Obsidian API
 			this.app.setting.open();
@@ -64,7 +64,7 @@ export default class ProdAppPlugin extends AppPlugin {
 
 		ribbonEl.innerHTML = RIBBON_ICON_SVG;
 
-		// For testings
+		// For testing
 		this.modalOrchestratorService.openConfirmModal(
 			"Bros nfgowneoun ok ayf qoewufofq",
 			() => {
@@ -84,20 +84,7 @@ export default class ProdAppPlugin extends AppPlugin {
 
 	onunload() {}
 
-	async loadSettings() {
-		const rawData = (await this.loadData()) as Partial<AppData>;
-		const defaultData: AppData = {
-			chosenVaultId: "",
-		};
-		const appData: AppData = {
-			...defaultData,
-			...rawData,
-		};
-
-		this.appGlobalState.onDataLoaded(appData);
-	}
-
 	onExternalSettingsChange() {
-		this.loadSettings();
+		this.appGlobalState.loadAllData();
 	}
 }

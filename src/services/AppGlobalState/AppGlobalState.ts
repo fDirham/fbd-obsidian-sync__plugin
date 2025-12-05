@@ -9,6 +9,16 @@ export default abstract class AppGlobalState {
 	abstract get authCreds(): ObservableValue<AuthCreds | null>;
 	abstract get vaults(): ObservableValue<AppVault[]>;
 	abstract get chosenVaultId(): ObservableValue<string>;
+	abstract get confirmRestoreLatestBackup(): boolean;
+	abstract get confirmRestoreSpecificBackup(): boolean;
+	abstract get confirmDeleteVault(): boolean;
+	abstract get confirmDeleteBackup(): boolean;
+	abstract get confirmUpload(): boolean;
+	abstract set confirmRestoreLatestBackup(value: boolean);
+	abstract set confirmRestoreSpecificBackup(value: boolean);
+	abstract set confirmDeleteVault(value: boolean);
+	abstract set confirmDeleteBackup(value: boolean);
+	abstract set confirmUpload(value: boolean);
 
 	constructor() {}
 
@@ -29,7 +39,7 @@ export default abstract class AppGlobalState {
 				chosenVaultId: newVal,
 			};
 
-			this.saveData(newData);
+			this.saveDataSlice(newData);
 		});
 
 		this.authCreds.addListener("agsDataSync", (_, newVal) => {
@@ -39,11 +49,19 @@ export default abstract class AppGlobalState {
 
 	onDataLoaded(appData: AppData) {
 		this.chosenVaultId.value = appData.chosenVaultId;
+		this.confirmDeleteBackup = appData.confirmDeleteBackup;
+		this.confirmDeleteVault = appData.confirmDeleteVault;
+		this.confirmRestoreLatestBackup = appData.confirmRestoreLatestBackup;
+		this.confirmRestoreSpecificBackup =
+			appData.confirmRestoreSpecificBackup;
+		this.confirmUpload = appData.confirmUpload;
 	}
 
 	abstract loadAllLocalStorage(): void;
 
-	abstract saveData(data: AppData): Promise<void>;
+	abstract loadAllData(): Promise<void>;
+
+	abstract saveDataSlice(data: Partial<AppData>): Promise<void>;
 
 	abstract saveLocalStorage(key: string, data: unknown): void;
 }
