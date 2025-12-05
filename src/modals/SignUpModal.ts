@@ -54,7 +54,7 @@ export default class SignUpModal extends Modal {
 					.onClick(() => {
 						onLogIn();
 					})
-					.setClass("small-button")
+					.setClass("fbd-sync__small-btn")
 			);
 	}
 }

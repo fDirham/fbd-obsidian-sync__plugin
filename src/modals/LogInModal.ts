@@ -53,7 +53,7 @@ export default class LogInModal extends Modal {
 					.onClick(() => {
 						onSignUp();
 					})
-					.setClass("small-button")
+					.setClass("fbd-sync__small-btn")
 			);
 
 		new Setting(bottomPartEl)
@@ -65,7 +65,7 @@ export default class LogInModal extends Modal {
 					.onClick(() => {
 						onResetPassword();
 					})
-					.setClass("small-button")
+					.setClass("fbd-sync__small-btn")
 			)
 			.addButton((btn) =>
 				btn
@@ -73,7 +73,7 @@ export default class LogInModal extends Modal {
 					.onClick(() => {
 						onVerify();
 					})
-					.setClass("small-button")
+					.setClass("fbd-sync__small-btn")
 			);
 	}
 }

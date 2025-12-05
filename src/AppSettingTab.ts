@@ -65,11 +65,26 @@ export default class AppSettingTab extends PluginSettingTab {
 		}
 
 		// User info and logout
-		new Setting(containerEl).setName(email).addButton((button) =>
-			button.setButtonText("Log Out").onClick(() => {
-				this.plugin.authService.logout();
-			})
-		);
+		new Setting(containerEl)
+			.setName(email)
+			.addButton((button) =>
+				button
+					.setButtonText("Delete user")
+					.onClick(() => {
+						this.plugin.authService.logout();
+					})
+					.setClass("fbd-sync__delete-btn")
+					.setClass("fbd-sync__small-btn")
+			)
+			.addButton((button) =>
+				button
+					.setButtonText("Log Out")
+					.onClick(() => {
+						this.plugin.authService.logout();
+					})
+					.setClass("fbd-sync__delete-btn")
+					.setClass("fbd-sync__small-btn")
+			);
 
 		let selectedVaultId = chosenVaultId.value;
 		const selectedVault = vaults.value.find(

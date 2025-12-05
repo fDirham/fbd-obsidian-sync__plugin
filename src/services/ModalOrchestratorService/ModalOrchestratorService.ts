@@ -16,4 +16,10 @@ export default abstract class ModalOrchestratorService {
 	abstract openNewVaultModal(): void;
 
 	abstract openEditVaultModal(appVault: AppVault): void;
+
+	abstract openConfirmModal(
+		description: string,
+		onConfirm: () => void,
+		onCancel: () => void
+	): void;
 }

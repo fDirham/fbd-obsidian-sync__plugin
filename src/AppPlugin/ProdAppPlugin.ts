@@ -15,6 +15,7 @@ export default class ProdAppPlugin extends AppPlugin {
 	constructor(app: App, manifest: PluginManifest) {
 		super(app, manifest);
 		const ags = new ProdAppGlobalState(app, this);
+		// TODO: switch to localhost services
 		// const authService = new LocalhostAuthService(ags);
 		// const appVaultsService = new LocalhostAppVaultsService(ags, app);
 		const authService = new DevAuthService(ags, app);
@@ -64,12 +65,21 @@ export default class ProdAppPlugin extends AppPlugin {
 		ribbonEl.innerHTML = RIBBON_ICON_SVG;
 
 		// For testings
-		// @ts-ignore - Obsidian API
-		this.app.setting.close();
-		// @ts-ignore - Obsidian API
-		this.app.setting.open();
-		// @ts-ignore - Obsidian API
-		this.app.setting.openTabById(this.manifest.id);
+		this.modalOrchestratorService.openConfirmModal(
+			"Bros nfgowneoun ok ayf qoewufofq",
+			() => {
+				console.log("Confirmed");
+			},
+			() => {
+				console.log("Cancelled");
+			}
+		);
+		// // @ts-ignore - Obsidian API
+		// this.app.setting.close();
+		// // @ts-ignore - Obsidian API
+		// this.app.setting.open();
+		// // @ts-ignore - Obsidian API
+		// this.app.setting.openTabById(this.manifest.id);
 	}
 
 	onunload() {}

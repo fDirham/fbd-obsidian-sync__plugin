@@ -12,6 +12,7 @@ import EditVaultModal from "src/modals/EditVaultModal";
 import AppVaultsService from "../AppVaultsService/AppVaultsService";
 import AppGlobalState from "../AppGlobalState/AppGlobalState";
 import { AppVault } from "src/model/AppVault";
+import ConfirmModal from "src/modals/ConfirmModal";
 
 export default class ProdModalOrchestratorService extends ModalOrchestratorService {
 	constructor(
@@ -204,6 +205,25 @@ export default class ProdModalOrchestratorService extends ModalOrchestratorServi
 			async (vaultId: string) => {
 				await this.appVaultsService.deleteVault(vaultId);
 				modal.close();
+			}
+		);
+
+		modal.open();
+	}
+
+	openConfirmModal(
+		description: string,
+		onConfirm: () => void,
+		onCancel: () => void
+	): void {
+		const modal = new ConfirmModal(
+			this.app,
+			description,
+			() => {
+				onConfirm();
+			},
+			() => {
+				onCancel();
 			}
 		);
 

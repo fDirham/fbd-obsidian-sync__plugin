@@ -11,6 +11,7 @@ If your plugin does not need CSS, delete this file.
 	--color-upload: #70d273;
 	--color-download: #79b4e4;
 	--color-delete: #ea6f6d;
+
 	--color-upload__text: #000;
 	--color-download__text: #000;
 	--color-delete__text: #000000;
@@ -20,13 +21,10 @@ If your plugin does not need CSS, delete this file.
 	--color-upload: #1c641e;
 	--color-download: #16578c;
 	--color-delete: #c62828;
+
 	--color-upload__text: #ffffff;
 	--color-download__text: #ffffff;
 	--color-delete__text: #ffffff;
-}
-
-.small-button {
-	font-size: 12px;
 }
 
 .no-border-settings .setting-item {
@@ -75,7 +73,25 @@ If your plugin does not need CSS, delete this file.
 	margin: 12px 0;
 }
 
+.confirm-modal__buttons {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.confirm-modal__btn {
+	width: 48%;
+}
+
+.confirm-modal__btn:not(:disabled):hover {
+	opacity: 0.8;
+}
+
 /* fbd sync styles */
+.fbd-sync__small-btn {
+	font-size: 12px;
+}
+
 .fbd-sync__btn__icon {
 	width: 16px;
 	height: 16px;
