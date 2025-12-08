@@ -1,4 +1,8 @@
-const BASE_API_URL = "http://localhost:3000";
+// Localhost
+// const BASE_API_URL = "http://localhost:3000";
+// Dev
+const BASE_API_URL =
+	"https://ct3evk2kp4.execute-api.us-west-2.amazonaws.com/Prod";
 
 const AppAPIRoutes = {
 	LOGIN: `${BASE_API_URL}/user/login`,
