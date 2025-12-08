@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import AppPlugin from "./AppPlugin/AppPlugin";
 import { AuthStatus } from "./model/AuthStatus";
 import { GEAR_ICON_SVG } from "./svgs/gearIconSvg";
@@ -104,6 +104,12 @@ export default class AppSettingTab extends PluginSettingTab {
 		if (!selectedVault && selectedVaultId != "") {
 			selectedVaultId = "";
 		}
+
+		new Setting(containerEl).addButton((btn) => {
+			btn.setButtonText("Refresh Vaults").onClick(() => {
+				this.plugin.appVaultsService.loadVaults();
+			});
+		});
 
 		// Chosen container
 		const chosenContainerEl = containerEl.createEl("div", {
@@ -215,10 +221,12 @@ export default class AppSettingTab extends PluginSettingTab {
 			));
 
 		if (confirmed) {
+			new Notice("Restoring latest backup...");
 			const latestBackup = selectedVault.backups.reduce((prev, current) =>
 				prev.createdAt > current.createdAt ? prev : current
 			);
-			this.plugin.appVaultsService.downloadBackup(latestBackup.id);
+			await this.plugin.appVaultsService.downloadBackup(latestBackup.id);
+			new Notice("Latest backup restored.");
 		}
 	}
 

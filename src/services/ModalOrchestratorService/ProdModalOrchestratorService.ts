@@ -43,6 +43,7 @@ export default class ProdModalOrchestratorService extends ModalOrchestratorServi
 			},
 			async (email, password) => {
 				try {
+					new Notice("Logging in...");
 					const { isVerified } = await this.authService.login(
 						email,
 						password
@@ -53,6 +54,7 @@ export default class ProdModalOrchestratorService extends ModalOrchestratorServi
 						);
 						return;
 					}
+					new Notice("Logged in successfully.");
 					loginModal.close();
 				} catch (e) {
 					new Notice("Login failed: " + (e as Error).message);

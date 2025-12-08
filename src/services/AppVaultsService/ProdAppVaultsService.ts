@@ -4,7 +4,7 @@ import { AppVault } from "src/model/AppVault";
 import { GetVaultsResponse } from "src/model/dto/GetVaultsResponse";
 import CreateVaultResponse from "src/model/dto/CreateVaultResponse";
 import { StartBackupResponse } from "src/model/dto/StartBackupResponse";
-import { App, normalizePath } from "obsidian";
+import { App, normalizePath, Notice } from "obsidian";
 import { CheckVaultBackupsResponse } from "src/model/dto/CheckVaultBackupsResponse";
 import {
 	deleteAllVaultFiles,
@@ -171,19 +171,23 @@ export default class ProdAppVaultsService extends AppVaultsService {
 
 		const tmpFilePath = normalizePath(`/vault-backup-${backupId}.zip`);
 
+		new Notice("Restoring backup...");
 		await deleteAllVaultFiles(this._app);
 		console.debug("Cleared vault files");
 
+		new Notice("Downloading backup...");
 		await downloadVaultZip(this._app, downloadUrl, tmpFilePath);
 
 		console.debug("Downloaded to:", tmpFilePath);
 
+		new Notice("Extracting backup...");
 		await extractZipToVault(this._app, tmpFilePath, "/");
 		console.debug("Extracted backup to vault");
 
 		await this._app.vault.adapter.remove(tmpFilePath);
 		console.debug("Removed temp file:", tmpFilePath);
 
+		new Notice("Backup restored.");
 		console.groupEnd();
 	}
 
