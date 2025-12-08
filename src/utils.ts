@@ -53,14 +53,14 @@ export async function typedFetch<
 
 		const text = await res.text();
 		if (!text) {
-			return undefined as Output;
+			return undefined as unknown as Output;
 		}
 
 		try {
 			return JSON.parse(text) as Output;
 		} catch (e) {
 			// Backend sent non-JSON response, treat as void/empty
-			return undefined as Output;
+			return undefined as unknown as Output;
 		}
 	} catch (error) {
 		clearTimeout(timeoutId);

@@ -24,12 +24,7 @@ export default class DevAppPlugin extends AppPlugin {
 			appVaultsService,
 			ags
 		);
-		return [
-			ags,
-			authService,
-			appVaultsService,
-			modalOrchestratorService,
-		] as const;
+		return [ags, authService, appVaultsService, modalOrchestratorService];
 	}
 
 	async afterBaseOnload() {
