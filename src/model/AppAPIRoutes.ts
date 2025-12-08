@@ -1,8 +1,14 @@
 // Localhost
 // const BASE_API_URL = "http://localhost:3000";
 // Dev
+// const BASE_API_URL =
+// 	"https://q41xlmeva1.execute-api.us-west-2.amazonaws.com/dev";
+// Staging
+// const BASE_API_URL =
+// 	"https://nsskci4gkb.execute-api.us-west-2.amazonaws.com/staging";
+// Production
 const BASE_API_URL =
-	"https://ct3evk2kp4.execute-api.us-west-2.amazonaws.com/Prod";
+	"https://e5djo5yw00.execute-api.us-west-2.amazonaws.com/prod";
 
 const AppAPIRoutes = {
 	LOGIN: `${BASE_API_URL}/user/login`,

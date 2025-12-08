@@ -17,7 +17,7 @@ export async function typedFetch<
 	options: Omit<RequestInit, "body">,
 	bodyData: Input | null = null,
 	queryParams: QueryParams = {} as QueryParams,
-	timeout = 5000
+	timeout = 15000
 ): Promise<Output> {
 	const fetchOptions: RequestInit = { ...options };
 
