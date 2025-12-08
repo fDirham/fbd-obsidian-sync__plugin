@@ -5,7 +5,6 @@ import AppGlobalState from "src/services/AppGlobalState/AppGlobalState";
 import AppVaultsService from "src/services/AppVaultsService/AppVaultsService";
 import AuthService from "src/services/AuthService/AuthService";
 import ModalOrchestratorService from "src/services/ModalOrchestratorService/ModalOrchestratorService";
-import { RIBBON_ICON_SVG } from "src/svgs/ribbonIconSvg";
 
 export default abstract class AppPlugin extends Plugin {
 	private _authService: AuthService;
@@ -89,14 +88,12 @@ export default abstract class AppPlugin extends Plugin {
 		this.addSettingTab(settingTab);
 
 		// Ribbon
-		const ribbonEl = this.addRibbonIcon("dice", "Vault Manager", () => {
+		this.addRibbonIcon("sync", "FBD Sync", () => {
 			// @ts-ignore - Obsidian API
 			this.app.setting.open();
 			// @ts-ignore - Obsidian API
 			this.app.setting.openTabById(this.manifest.id);
 		});
-
-		ribbonEl.innerHTML = RIBBON_ICON_SVG;
 
 		await this.afterBaseOnload();
 	}
