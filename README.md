@@ -1,5 +1,5 @@
 # Overview
-[Website](da8re62zge7z0.cloudfront.net)
+[Website](https://da8re62zge7z0.cloudfront.net)
 
 An open source obsidian plugin with basic syncing. Supports both desktop and mobile. Go to the website for more details.
 
