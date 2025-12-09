@@ -3,7 +3,7 @@
 
 An open source obsidian plugin with basic syncing. Supports both desktop and mobile. Go to the website for more details.
 
-[Backend repo](https://github.com/fDirham/fbd-obsidian-sync__dashboard-api)
+[Backend repo](https://github.com/fDirham/fbd-obsidian-sync__monorepo)
 
 ## Some problems
 -   Jwt credentials stored in local storage for now, which can be insecure but I'm putting this off for now.
