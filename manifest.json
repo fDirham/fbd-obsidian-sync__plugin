@@ -1,6 +1,6 @@
 {
-	"id": "fbd-obsidian-sync",
-	"name": "FBD Obsidian Sync",
+	"id": "fbd-sync",
+	"name": "FBD Sync",
 	"version": "1.0.3",
 	"minAppVersion": "0.15.0",
 	"description": "Cross platform data syncing.",
